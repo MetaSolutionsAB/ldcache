@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ld-cache</groupId>
+    <artifactId>ld-cache</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>LD Cache</name>
+
+    <properties>
+        <sesame.version>2.7.11</sesame.version>
+        <slf4j.version>1.7.5</slf4j.version>
+	<restlet.version>2.2.0</restlet.version>
+        <servlet.version>3.0.1</servlet.version>
+    </properties>
+
+    <developers>
+        <developer>
+		<name>Hannes Ebner</name>
+		<id>hannes</id>
+		<email>hannes at metasolutions.se</email>
+		<organization>MetaSolutions AB</organization>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>MetaSolutions AB</name>
+        <url>http://www.metasolutions.se</url>
+    </organization>
+
+    <licenses>
+        <license>
+		<name>Apache License Version 2.0</name>
+		<url>http://www.apache.org/licenses/</url>
+		<distribution>repo</distribution>
+		<comments />
+        </license>
+    </licenses>
+
+    <build>
+        <plugins>
+		<plugin>
+		    <artifactId>maven-compiler-plugin</artifactId>
+		    <configuration>
+		        <source>1.7</source>
+		        <target>1.7</target>
+		        <compilerArgument></compilerArgument>
+		    </configuration>
+		</plugin>
+		<plugin>
+		    <groupId>org.codehaus.mojo</groupId>
+		    <artifactId>appassembler-maven-plugin</artifactId>
+		    <configuration>
+		        <programs>
+				<program>
+				    <mainClass>org.entrystore.ldcache.LDCache</mainClass>
+				    <id>ldc</id>
+				</program>
+		        </programs>
+		        <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
+		        <extraJvmArguments>-Xms256m</extraJvmArguments>
+		    </configuration>
+		    <executions>
+		        <execution>
+				<phase>package</phase>
+				<goals>
+				    <goal>assemble</goal>
+				</goals>
+		        </execution>
+		    </executions>
+		</plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+	<!--
+        <repository>
+		<id>OpenRDF</id>
+		<url>http://repo.aduna-software.org/maven2/releases</url>
+        </repository>
+	-->
+        <repository>
+		<id>Maven</id>
+		<url>http://repo1.maven.org/maven2</url>
+        </repository>
+	<repository>  
+		<id>Restlet</id>  
+		<url>http://maven.restlet.org</url>  
+	</repository>
+    </repositories>
+
+    <dependencies>
+		<dependency>
+   			<groupId>org.restlet.jee</groupId>
+   			<artifactId>org.restlet</artifactId>
+   			<version>${restlet.version}</version>
+		</dependency>
+		<dependency>
+   			<groupId>org.restlet.jee</groupId>
+   			<artifactId>org.restlet.ext.servlet</artifactId>
+   			<version>${restlet.version}</version>
+		</dependency>
+		<dependency>
+   			<groupId>org.restlet.jse</groupId>
+   			<artifactId>org.restlet.ext.simple</artifactId>
+   			<version>${restlet.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet.ext.json</artifactId>
+			<version>${restlet.version}</version>
+		</dependency>
+		<dependency>
+   			<groupId>org.simpleframework</groupId>
+   			<artifactId>org.simpleframework</artifactId>
+   			<version>4.1.1</version>
+		</dependency>	  
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20131018</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jsonld-java</groupId>
+			<artifactId>jsonld-java-sesame</artifactId>
+			<version>0.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.openrdf.sesame</groupId>
+					<artifactId>sesame-model</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openrdf.sesame</groupId>
+					<artifactId>sesame-rio-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-runtime</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-model</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-trig</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-turtle</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-n3</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-rdfxml</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-trix</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-rdfjson</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-nativerdf</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-memory</artifactId>
+			<version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
