@@ -42,6 +42,8 @@ public class NS {
 
 	public static String skos = "http://www.w3.org/2004/02/skos/core#";
 
+	public static String ldc = "http://entrystore.org/ldc/terms/";
+
 	private static HashMap<String, String> map = new HashMap<String, String>();
 
 	static {

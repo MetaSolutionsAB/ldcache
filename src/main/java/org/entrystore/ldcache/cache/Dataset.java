@@ -29,8 +29,6 @@ public interface Dataset {
 
 	URI getURI();
 
-	void setURI(URI uri);
-
 	Date getModified();
 
 	Set<URI> getGraphs();
