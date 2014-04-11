@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2014 MetaSolutions AB <info@metasolutions.se>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.entrystore.ldcache.resources;
 
 import org.apache.log4j.Logger;
@@ -16,6 +32,7 @@ import org.restlet.Response;
 import org.restlet.Uniform;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Preference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
@@ -51,6 +68,8 @@ public class CacheResource extends BaseResource {
 	int depth;
 
 	Set<URI> follow;
+
+	List<Preference<MediaType>> rdfFormats = new ArrayList<Preference<MediaType>>();
 
 	List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
 
@@ -102,15 +121,18 @@ public class CacheResource extends BaseResource {
 
 	@Override
 	protected void doInit() {
-		supportedMediaTypes.add(MediaType.APPLICATION_RDF_XML);
-		supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-		supportedMediaTypes.add(MediaType.TEXT_RDF_N3);
-		supportedMediaTypes.add(new MediaType(RDFFormat.TURTLE.getDefaultMIMEType()));
-		supportedMediaTypes.add(new MediaType(RDFFormat.TRIX.getDefaultMIMEType()));
-		supportedMediaTypes.add(new MediaType(RDFFormat.NTRIPLES.getDefaultMIMEType()));
-		supportedMediaTypes.add(new MediaType(RDFFormat.TRIG.getDefaultMIMEType()));
-		supportedMediaTypes.add(new MediaType(RDFFormat.JSONLD.getDefaultMIMEType()));
-		supportedMediaTypes.add(new MediaType(RDFFormat.RDFJSON.getDefaultMIMEType()));
+		rdfFormats.add(new Preference(MediaType.APPLICATION_RDF_XML));
+		rdfFormats.add(new Preference(MediaType.APPLICATION_JSON));
+		rdfFormats.add(new Preference(MediaType.TEXT_RDF_N3));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.TURTLE.getDefaultMIMEType())));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.TRIX.getDefaultMIMEType())));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.NTRIPLES.getDefaultMIMEType())));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.TRIG.getDefaultMIMEType())));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.JSONLD.getDefaultMIMEType())));
+		rdfFormats.add(new Preference(new MediaType(RDFFormat.RDFJSON.getDefaultMIMEType())));
+		for (Preference<MediaType> p : rdfFormats) {
+			supportedMediaTypes.add(p.getMetadata());
+		}
 		prepareProxyRequest();
 	}
 
@@ -214,6 +236,7 @@ public class CacheResource extends BaseResource {
 		}
 
 		Request request = new Request(Method.GET, url);
+		getRequest().getClientInfo().getAcceptedMediaTypes().addAll(rdfFormats);
 		request.getClientInfo().setAcceptedMediaTypes(getRequest().getClientInfo().getAcceptedMediaTypes());
 		Response response = client.handle(request);
 
