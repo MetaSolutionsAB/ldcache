@@ -26,11 +26,11 @@ import java.util.Set;
 /**
  * @author Hannes Ebner
  */
-public class SAILCache implements Cache {
+public class SailCache implements Cache {
 
 	Repository repository;
 
-	public SAILCache(Repository repository) {
+	public SailCache(Repository repository) {
 		this.repository = repository;
 	}
 

@@ -39,9 +39,9 @@ import java.util.Set;
 /**
  * @author Hannes Ebner
  */
-public class SAILDataset implements Dataset {
+public class SailDataset implements Dataset {
 
-	Logger log = Logger.getLogger(SAILDataset.class);
+	Logger log = Logger.getLogger(SailDataset.class);
 
 	Repository repository;
 
@@ -51,7 +51,7 @@ public class SAILDataset implements Dataset {
 
 	ValueFactory valueFactory;
 
-	public SAILDataset(Repository repository, URI uri) {
+	public SailDataset(Repository repository, URI uri) {
 		this.repository = repository;
 		this.valueFactory = repository.getValueFactory();
 		this.uri = uri;
