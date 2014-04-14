@@ -25,18 +25,16 @@ import java.util.Set;
 /**
  * @author Hannes Ebner
  */
-public interface Dataset {
+public interface Resource {
 
 	URI getURI();
 
 	Date getModified();
 
-	Set<URI> getResources();
+	void setModified(Date modified);
 
-	Resource getResource(URI uri);
+	Model getGraph();
 
-	void putResource(Resource res);
-
-	void removeResource(URI uri);
+	void setGraph(Model graph);
 
 }

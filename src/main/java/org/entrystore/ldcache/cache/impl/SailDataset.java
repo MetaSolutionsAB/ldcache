@@ -45,21 +45,21 @@ public class SailDataset implements Dataset {
 
 	Repository repository;
 
-	URI uri;
+	URI datasetURI;
 
 	Date lastModified;
 
 	ValueFactory valueFactory;
 
-	public SailDataset(Repository repository, URI uri) {
+	public SailDataset(Repository repository, URI datasetURI) {
 		this.repository = repository;
 		this.valueFactory = repository.getValueFactory();
-		this.uri = uri;
+		this.datasetURI = datasetURI;
 	}
 
 	@Override
 	public URI getURI() {
-		return uri;
+		return datasetURI;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class SailDataset implements Dataset {
 			RepositoryConnection rc = null;
 			try {
 				rc = repository.getConnection();
-				RepositoryResult<Statement> rr = rc.getStatements(uri, valueFactory.createURI(NS.dcterms, "modified"), null, false);
+				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, valueFactory.createURI(NS.dcterms, "modified"), null, false, datasetURI);
 				if (rr.hasNext()) {
 					Statement result = rr.next();
 					if (result.getObject() instanceof Literal) {
@@ -92,15 +92,15 @@ public class SailDataset implements Dataset {
 	}
 
 	@Override
-	public Set<URI> getGraphs() {
-		if (uri == null) {
+	public Set<URI> getResources() {
+		if (datasetURI == null) {
 			throw new IllegalArgumentException();
 		}
 		RepositoryConnection rc = null;
 		Set<URI> result = null;
 		try {
 			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(uri, valueFactory.createURI(NS.ldc, "hasGraph"), null, false, uri);
+			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, valueFactory.createURI(NS.ldc, "resource"), null, false, datasetURI);
 			while (rr.hasNext()) {
 				Statement s = rr.next();
 				if (s.getObject() instanceof URI) {
@@ -122,15 +122,16 @@ public class SailDataset implements Dataset {
 	}
 
 	@Override
-	public Model getGraph(URI uri) {
-		if (uri == null) {
+	public org.entrystore.ldcache.cache.Resource getResource(URI resourceURI) {
+		if (resourceURI == null) {
 			throw new IllegalArgumentException();
 		}
+		/*
 		RepositoryConnection rc = null;
 		Model result = null;
 		try {
 			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(null, null, null, false, uri);
+			RepositoryResult<Statement> rr = rc.getStatements(null, null, null, false, resourceURI);
 			result = Iterations.addAll(rr, new LinkedHashModel());
 		} catch (RepositoryException e) {
 			log.error(e.getMessage());
@@ -144,18 +145,21 @@ public class SailDataset implements Dataset {
 			}
 		}
 		return result;
+		*/
+		return new RdfResource(resourceURI, null, null); //FIXME
 	}
 
 	@Override
-	public void putGraph(URI uri, Model graph) {
-		if (uri == null || graph == null) {
+	public void putResource(org.entrystore.ldcache.cache.Resource resource) {
+		if (resource == null) {
 			throw new IllegalArgumentException();
 		}
 		RepositoryConnection rc = null;
 		try {
 			rc = repository.getConnection();
 			rc.begin();
-			rc.add(graph, uri);
+			// FIXME
+			// rc.add(graph, uri);
 			updateLastModified(rc);
 			rc.commit();
 		} catch (RepositoryException e) {
@@ -177,15 +181,16 @@ public class SailDataset implements Dataset {
 	}
 
 	@Override
-	public void removeGraph(URI uri) {
-		if (uri == null) {
+	public void removeResource(URI resourceURI) {
+		if (resourceURI == null) {
 			throw new IllegalArgumentException();
 		}
 		RepositoryConnection rc = null;
 		try {
 			rc = repository.getConnection();
 			rc.begin();
-			rc.remove((Resource) null, (URI) null, (Value) null, uri);
+			//FIXME
+			rc.remove((Resource) null, (URI) null, (Value) null, resourceURI);
 			rc.commit();
 		} catch (RepositoryException e) {
 			try {
@@ -208,10 +213,8 @@ public class SailDataset implements Dataset {
 	private void updateLastModified(RepositoryConnection rc) throws RepositoryException {
 		this.lastModified = new Date();
 		URI dateProp = valueFactory.createURI(NS.dcterms, "modified");
-		rc.remove(uri, dateProp, null);
-		rc.add(uri, dateProp, valueFactory.createLiteral(this.lastModified));
+		rc.remove(datasetURI, dateProp, null);
+		rc.add(datasetURI, dateProp, valueFactory.createLiteral(this.lastModified));
 	}
-
-	// FIXME we need last modified for graphs AND dataset
 
 }
