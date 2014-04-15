@@ -16,18 +16,14 @@
 
 package org.entrystore.ldcache.cache.impl;
 
-import info.aduna.iteration.Iterations;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Dataset;
-import org.entrystore.ldcache.util.NS;
+import org.entrystore.ldcache.util.Properties;
 import org.openrdf.model.Literal;
-import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -49,11 +45,8 @@ public class SailDataset implements Dataset {
 
 	Date lastModified;
 
-	ValueFactory valueFactory;
-
 	public SailDataset(Repository repository, URI datasetURI) {
 		this.repository = repository;
-		this.valueFactory = repository.getValueFactory();
 		this.datasetURI = datasetURI;
 	}
 
@@ -68,7 +61,7 @@ public class SailDataset implements Dataset {
 			RepositoryConnection rc = null;
 			try {
 				rc = repository.getConnection();
-				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, valueFactory.createURI(NS.dcterms, "modified"), null, false, datasetURI);
+				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.modified, null, false, datasetURI);
 				if (rr.hasNext()) {
 					Statement result = rr.next();
 					if (result.getObject() instanceof Literal) {
@@ -100,7 +93,7 @@ public class SailDataset implements Dataset {
 		Set<URI> result = null;
 		try {
 			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, valueFactory.createURI(NS.ldc, "resource"), null, false, datasetURI);
+			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.resource, null, false, datasetURI);
 			while (rr.hasNext()) {
 				Statement s = rr.next();
 				if (s.getObject() instanceof URI) {
@@ -126,27 +119,7 @@ public class SailDataset implements Dataset {
 		if (resourceURI == null) {
 			throw new IllegalArgumentException();
 		}
-		/*
-		RepositoryConnection rc = null;
-		Model result = null;
-		try {
-			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(null, null, null, false, resourceURI);
-			result = Iterations.addAll(rr, new LinkedHashModel());
-		} catch (RepositoryException e) {
-			log.error(e.getMessage());
-		} finally {
-			if (rc != null) {
-				try {
-					rc.close();
-				} catch (RepositoryException e) {
-					log.error(e.getMessage());
-				}
-			}
-		}
-		return result;
-		*/
-		return new RdfResource(resourceURI, null, null); //FIXME
+		return RdfResource.loadFromRepository(repository, resourceURI);
 	}
 
 	@Override
@@ -154,30 +127,8 @@ public class SailDataset implements Dataset {
 		if (resource == null) {
 			throw new IllegalArgumentException();
 		}
-		RepositoryConnection rc = null;
-		try {
-			rc = repository.getConnection();
-			rc.begin();
-			// FIXME
-			// rc.add(graph, uri);
-			updateLastModified(rc);
-			rc.commit();
-		} catch (RepositoryException e) {
-			try {
-				rc.rollback();
-			} catch (RepositoryException re) {
-				log.error(re.getMessage());
-			}
-			log.error(e.getMessage());
-		} finally {
-			if (rc != null) {
-				try {
-					rc.close();
-				} catch (RepositoryException e) {
-					log.error(e.getMessage());
-				}
-			}
-		}
+		RdfResource.saveToRepository(repository, resource);
+		updateModified(new Date());
 	}
 
 	@Override
@@ -185,36 +136,71 @@ public class SailDataset implements Dataset {
 		if (resourceURI == null) {
 			throw new IllegalArgumentException();
 		}
-		RepositoryConnection rc = null;
-		try {
-			rc = repository.getConnection();
-			rc.begin();
-			//FIXME
-			rc.remove((Resource) null, (URI) null, (Value) null, resourceURI);
-			rc.commit();
-		} catch (RepositoryException e) {
+		RdfResource.removeFromRepository(repository, resourceURI);
+		updateModified(new Date());
+	}
+
+	@Override
+	public void delete() {
+		for (URI r : getResources()) {
+			RdfResource.removeFromRepository(repository, r);
+		}
+		synchronized (repository) {
+			RepositoryConnection rc = null;
 			try {
-				rc.rollback();
-			} catch (RepositoryException re) {
-				log.error(re.getMessage());
-			}
-			log.error(e.getMessage());
-		} finally {
-			if (rc != null) {
+				rc = repository.getConnection();
+				rc.begin();
+				rc.remove((Resource) null, (URI) null, (Value) null, datasetURI);
+				rc.commit();
+			} catch (RepositoryException e) {
 				try {
-					rc.close();
-				} catch (RepositoryException e) {
-					log.error(e.getMessage());
+					rc.rollback();
+				} catch (RepositoryException re) {
+					log.error(re.getMessage());
+				}
+				log.error(e.getMessage());
+			} finally {
+				if (rc != null) {
+					try {
+						rc.close();
+					} catch (RepositoryException e) {
+						log.error(e.getMessage());
+					}
 				}
 			}
 		}
 	}
 
-	private void updateLastModified(RepositoryConnection rc) throws RepositoryException {
-		this.lastModified = new Date();
-		URI dateProp = valueFactory.createURI(NS.dcterms, "modified");
-		rc.remove(datasetURI, dateProp, null);
-		rc.add(datasetURI, dateProp, valueFactory.createLiteral(this.lastModified));
+	private void updateModified(Date lastModified) {
+		if (lastModified == null) {
+			throw new IllegalArgumentException();
+		}
+		synchronized (repository) {
+			RepositoryConnection rc = null;
+			try {
+				rc = repository.getConnection();
+				rc.begin();
+				rc.remove(datasetURI, Properties.modified, null, datasetURI);
+				rc.add(datasetURI, Properties.modified, Properties.getValueFactory().createLiteral(lastModified), datasetURI);
+				rc.commit();
+				this.lastModified = lastModified;
+			} catch (RepositoryException e) {
+				try {
+					rc.rollback();
+				} catch (RepositoryException re) {
+					log.error(re.getMessage());
+				}
+				log.error(e.getMessage());
+			} finally {
+				if (rc != null) {
+					try {
+						rc.close();
+					} catch (RepositoryException e) {
+						log.error(e.getMessage());
+					}
+				}
+			}
+		}
 	}
 
 }

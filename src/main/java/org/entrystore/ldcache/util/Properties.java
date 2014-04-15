@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package org.entrystore.ldcache.cache;
+package org.entrystore.ldcache.util;
 
-import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-
-import java.util.Date;
-import java.util.Set;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 /**
  * @author Hannes Ebner
  */
-public interface Dataset {
+public class Properties {
 
-	URI getURI();
+	private static ValueFactory valueFactory;
 
-	Date getModified();
+	public static URI modified;
 
-	Set<URI> getResources();
+	public static URI resource;
 
-	Resource getResource(URI uri);
+	static {
+		valueFactory = new ValueFactoryImpl();
+		modified = valueFactory.createURI(NS.dcterms, "modified");
+		resource = valueFactory.createURI(NS.ldc, "resource");
+	}
 
-	void putResource(Resource res);
-
-	void removeResource(URI uri);
-
-	void delete();
+	public static ValueFactory getValueFactory() {
+		return valueFactory;
+	}
 
 }
