@@ -27,14 +27,14 @@ public class Properties {
 
 	private static ValueFactory valueFactory;
 
-	public static URI modified;
+	public static URI dctModified;
 
-	public static URI resource;
+	public static URI ldcResource;
 
 	static {
 		valueFactory = new ValueFactoryImpl();
-		modified = valueFactory.createURI(NS.dcterms, "modified");
-		resource = valueFactory.createURI(NS.ldc, "resource");
+		dctModified = valueFactory.createURI(NS.dcterms, "dctModified");
+		ldcResource = valueFactory.createURI(NS.ldc, "ldcResource");
 	}
 
 	public static ValueFactory getValueFactory() {

@@ -25,12 +25,8 @@ import java.util.Set;
  */
 public interface Cache {
 
-	Set<Dataset> getDatasets();
+	void cacheResource(URI resourceURI);
 
-	Dataset getDataset(URI uri);
 
-	void putDataset(URI uri, Dataset ds);
-
-	void removeDataset(URI uri);
 
 }

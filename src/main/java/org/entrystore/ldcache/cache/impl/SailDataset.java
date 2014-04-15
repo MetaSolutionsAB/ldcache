@@ -61,7 +61,7 @@ public class SailDataset implements Dataset {
 			RepositoryConnection rc = null;
 			try {
 				rc = repository.getConnection();
-				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.modified, null, false, datasetURI);
+				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.dctModified, null, false, datasetURI);
 				if (rr.hasNext()) {
 					Statement result = rr.next();
 					if (result.getObject() instanceof Literal) {
@@ -93,7 +93,7 @@ public class SailDataset implements Dataset {
 		Set<URI> result = null;
 		try {
 			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.resource, null, false, datasetURI);
+			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.ldcResource, null, false, datasetURI);
 			while (rr.hasNext()) {
 				Statement s = rr.next();
 				if (s.getObject() instanceof URI) {
@@ -180,8 +180,8 @@ public class SailDataset implements Dataset {
 			try {
 				rc = repository.getConnection();
 				rc.begin();
-				rc.remove(datasetURI, Properties.modified, null, datasetURI);
-				rc.add(datasetURI, Properties.modified, Properties.getValueFactory().createLiteral(lastModified), datasetURI);
+				rc.remove(datasetURI, Properties.dctModified, null, datasetURI);
+				rc.add(datasetURI, Properties.dctModified, Properties.getValueFactory().createLiteral(lastModified), datasetURI);
 				rc.commit();
 				this.lastModified = lastModified;
 			} catch (RepositoryException e) {

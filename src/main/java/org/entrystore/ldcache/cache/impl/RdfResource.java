@@ -99,7 +99,7 @@ public class RdfResource implements Resource {
 			RepositoryResult<Statement> rr = rc.getStatements(null, null, null, false, resourceURI);
 			Model resource = Iterations.addAll(rr, new LinkedHashModel());
 			// get modification date
-			rr = rc.getStatements(resourceURI, Properties.modified, null, false);
+			rr = rc.getStatements(resourceURI, Properties.dctModified, null, false);
 			if (rr.hasNext()) {
 				Value modifiedValue = rr.next().getObject();
 				if (modifiedValue instanceof Literal) {
@@ -133,8 +133,8 @@ public class RdfResource implements Resource {
 				rc = repository.getConnection();
 				rc.begin();
 				rc.add(resource.getGraph(), resource.getURI());
-				rc.remove(resource.getURI(), Properties.modified, null);
-				rc.add(resource.getURI(), Properties.modified, Properties.getValueFactory().createLiteral(resource.getModified()));
+				rc.remove(resource.getURI(), Properties.dctModified, null);
+				rc.add(resource.getURI(), Properties.dctModified, Properties.getValueFactory().createLiteral(resource.getModified()));
 				rc.commit();
 			} catch (RepositoryException e) {
 				try {
@@ -165,7 +165,7 @@ public class RdfResource implements Resource {
 				rc = repository.getConnection();
 				rc.begin();
 				rc.remove((org.openrdf.model.Resource) null, (URI) null, (Value) null, resourceURI);
-				rc.remove(resourceURI, Properties.modified, null);
+				rc.remove(resourceURI, Properties.dctModified, null);
 				rc.commit();
 			} catch (RepositoryException e) {
 				try {

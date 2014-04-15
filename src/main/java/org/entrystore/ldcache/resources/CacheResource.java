@@ -159,7 +159,7 @@ public class CacheResource extends BaseResource {
 		if (clientResponse != null) {
 			input = clientResponse.getEntity();
 			representationMediaType = input.getMediaType();
-			log.debug("Received proxied resource in format " + representationMediaType);
+			log.debug("Received proxied ldcResource in format " + representationMediaType);
 			getResponse().setStatus(clientResponse.getStatus());
 			getResponse().setOnSent(new Uniform() {
 				public void handle(Request request, Response response) {
