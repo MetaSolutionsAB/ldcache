@@ -14,20 +14,37 @@
  * limitations under the License.
  */
 
-package org.entrystore.ldcache.cache;
+package org.entrystore.ldcache.cache.impl;
 
+import org.entrystore.ldcache.cache.Cache;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-
-import java.util.Set;
 
 /**
  * @author Hannes Ebner
  */
-public interface Cache {
+public class RioCache implements Cache {
 
-	Model get(URI resourceURI);
+	Cache parentCache;
 
-	void remove(URI resourceURI);
+	public RioCache() {
+	}
+
+	public RioCache(Cache parentCache) {
+		if (parentCache == null) {
+			throw new IllegalArgumentException();
+		}
+		this.parentCache = parentCache;
+	}
+
+	@Override
+	public Model get(URI resourceURI) {
+		return null;
+	}
+
+	@Override
+	public void remove(URI resourceURI) {
+
+	}
 
 }
