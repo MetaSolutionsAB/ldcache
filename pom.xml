@@ -147,7 +147,7 @@
 		<dependency>
 			<groupId>com.github.jsonld-java</groupId>
 			<artifactId>jsonld-java-sesame</artifactId>
-			<version>0.3</version>
+			<version>0.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.openrdf.sesame</groupId>
@@ -220,5 +220,26 @@
 			<version>16.0.1</version>
 		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+                <dependencies>
+                        <dependency>
+                                <groupId>com.fasterxml.jackson.core</groupId>
+                                <artifactId>jackson-core</artifactId>
+                                <version>2.3.3</version>
+                        </dependency>
+                        <dependency>
+                                <groupId>com.fasterxml.jackson.core</groupId>
+                                <artifactId>jackson-databind</artifactId>
+                                <version>2.3.3</version>
+                        </dependency>
+                        <dependency>
+                                <groupId>com.fasterxml.jackson.core</groupId>
+                                <artifactId>jackson-annotations</artifactId>
+                                <version>2.3.3</version>
+                        </dependency>
+                </dependencies>
+        </dependencyManagement>
+
 
 </project>

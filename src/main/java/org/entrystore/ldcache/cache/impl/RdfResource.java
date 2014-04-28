@@ -57,7 +57,7 @@ public class RdfResource implements Resource {
 
 	@Override
 	public URI getURI() {
-		return null;
+		return resourceURI;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class RdfResource implements Resource {
 		this.modified = new Date();
 	}
 
-	static Resource loadFromRepository(Repository repository, URI resourceURI) {
+	public static Resource loadFromRepository(Repository repository, URI resourceURI) {
 		if (repository == null || resourceURI == null) {
 			throw new IllegalArgumentException();
 		}
@@ -123,7 +123,7 @@ public class RdfResource implements Resource {
 		return result;
 	}
 
-	static void saveToRepository(Repository repository, Resource resource) {
+	public static void saveToRepository(Repository repository, Resource resource) {
 		if (repository == null || resource == null) {
 			throw new IllegalArgumentException();
 		}
@@ -155,7 +155,7 @@ public class RdfResource implements Resource {
 		}
 	}
 
-	static void removeFromRepository(Repository repository, URI resourceURI) {
+	public static void removeFromRepository(Repository repository, URI resourceURI) {
 		if (repository == null || resourceURI == null) {
 			throw new IllegalArgumentException();
 		}

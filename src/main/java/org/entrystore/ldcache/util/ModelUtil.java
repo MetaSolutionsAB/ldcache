@@ -16,29 +16,11 @@
 
 package org.entrystore.ldcache.util;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
-
 /**
  * @author Hannes Ebner
  */
-public class Properties {
+public class ModelUtil {
 
-	private static ValueFactory valueFactory;
 
-	public static URI dctModified;
-
-	public static URI ldcResource;
-
-	static {
-		valueFactory = new ValueFactoryImpl();
-		dctModified = valueFactory.createURI(NS.dcterms, "modified");
-		ldcResource = valueFactory.createURI(NS.ldc, "resource");
-	}
-
-	public static ValueFactory getValueFactory() {
-		return valueFactory;
-	}
 
 }

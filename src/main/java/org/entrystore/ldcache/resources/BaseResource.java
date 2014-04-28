@@ -17,13 +17,20 @@
 package org.entrystore.ldcache.resources;
 
 import org.apache.log4j.Logger;
+import org.entrystore.ldcache.LDCache;
+import org.entrystore.ldcache.util.NS;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.MediaType;
 import org.restlet.resource.ServerResource;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Hannes Ebner
@@ -34,10 +41,24 @@ public class BaseResource extends ServerResource {
 
 	private static Logger log = Logger.getLogger(BaseResource.class);
 
+	URI url;
+
+	int depth;
+
+	Set<URI> follow;
+
 	@Override
 	public void init(Context c, Request request, Response response) {
 		parameters = parseRequest(request.getResourceRef().getRemainingPart());
+		prepareParameters();
 		super.init(c, request, response);
+	}
+
+	@Override
+	protected void doRelease() {
+		url = null;
+		depth = 0;
+		follow = null;
 	}
 
 	static public HashMap<String, String> parseRequest(String request) {
@@ -61,6 +82,49 @@ public class BaseResource extends ServerResource {
 			argsAndVal.put(req, "");
 		}
 		return argsAndVal;
+	}
+
+	private void prepareParameters() {
+		if (parameters.containsKey("url")) {
+			url = new URIImpl(urlDecode(parameters.get("url")));
+		}
+
+		if (parameters.containsKey("follow")) {
+			String followStr = urlDecode(parameters.get("follow"));
+			if (followStr != null) {
+				follow = new HashSet();
+				String[] followSplitStr = followStr.split(",");
+				for (String s : followSplitStr) {
+					s = NS.expandNS(s.trim());
+					if (!s.contains(":")) {
+						follow.add(new URIImpl(s));
+					}
+				}
+			}
+		}
+
+		if (parameters.containsKey("depth")) {
+			try {
+				depth = Integer.valueOf(parameters.get("depth"));
+			} catch (NumberFormatException nfe) {
+				log.error(nfe.getMessage());
+			}
+		}
+	}
+
+	private String urlDecode(String input) {
+		if (input != null) {
+			try {
+				return URLDecoder.decode(input, "UTF-8");
+			} catch (UnsupportedEncodingException uee) {
+				log.error(uee.getMessage());
+			}
+		}
+		return null;
+	}
+
+	public LDCache getLDCache() {
+		return ((LDCache) getContext().getAttributes().get(LDCache.KEY));
 	}
 
 }
