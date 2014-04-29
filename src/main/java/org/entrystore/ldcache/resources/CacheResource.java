@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.rio.RDFFormat;
@@ -42,6 +43,7 @@ import org.restlet.resource.Post;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,30 +70,22 @@ public class CacheResource extends BaseResource {
 		Representation output = null;
 		log.info("Received caching request for " + url);
 
-		Repository repository = getLDCache().getRepository();
-		Resource resource = RdfResource.loadFromRepository(repository, url);
-
-		if (resource != null && resource.getGraph() != null) {
+		Model resultGraph = mergeGraphs(new HashSet<Value>(Arrays.asList(url)), follow, new HashSet<URI>(), 0, depth);
+		if (resultGraph.size() > 0) {
 			String outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
 			log.debug("Writing content in format " + outputMediaType);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try {
-				Rio.write(resource.getGraph(), baos, RDFFormat.forMIMEType(outputMediaType));
+				Rio.write(resultGraph, baos, RDFFormat.forMIMEType(outputMediaType));
 			} catch (RDFHandlerException e) {
 				log.error("RDF handler " + e.getMessage());
 			}
-			output = new ByteArrayRepresentation(baos.toByteArray());
-		}
-
-		if (output != null) {
-			return output;
+			return new ByteArrayRepresentation(baos.toByteArray());
 		}
 
 		getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
 		return null;
 	}
-
-	Set<URI> visited = new HashSet<URI>();
 
 	@Post("json")
 	public void postJSON(Representation r) {
@@ -141,7 +135,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cacheResources(jsonArrayToSet(toAdd), jsonArrayToSet(toFollow), 0, depth);
+		cacheResources(jsonArrayToSet(toAdd), jsonArrayToSet(toFollow), new HashSet<URI>(), 0, depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
@@ -163,7 +157,7 @@ public class CacheResource extends BaseResource {
 		return result;
 	}
 
-	private void cacheResources(Set<Value> resources, Set<Value> propertiesToFollow, int level, int depth) {
+	private void cacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<URI> visited, int level, int depth) {
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
 				continue;
@@ -181,9 +175,9 @@ public class CacheResource extends BaseResource {
 				if (propertiesToFollow != null && level < depth+1) {
 					for (Value prop : propertiesToFollow) {
 						if (prop instanceof URI) {
-							log.info("Following: " + prop);
+							log.debug("Following: " + prop);
 							Model matches = graph.filter((org.openrdf.model.Resource) null, (URI) prop, (Value) null);
-							cacheResources(matches.objects(), propertiesToFollow, ++level, depth);
+							cacheResources(matches.objects(), propertiesToFollow, visited, ++level, depth);
 						}
 					}
 				}
@@ -191,6 +185,37 @@ public class CacheResource extends BaseResource {
 				log.error("Model was null for: " + r.toString());
 			}
 		}
+	}
+
+	private Model mergeGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<URI> visited, int level, int depth) {
+		Model result = new LinkedHashModel();
+		for (Value r : resources) {
+			if (!(r instanceof URI)) {
+				continue;
+			}
+			if (visited.contains((URI) r)) {
+				log.debug("Already visited, skipping: " + r);
+				continue;
+			}
+			visited.add((URI) r);
+			Resource res = RdfResource.loadFromRepository(getLDCache().getRepository(), (URI) r);
+			if (res == null || res.getGraph() == null) {
+				continue;
+			}
+			log.info("Loaded from local repository: " + r);
+			Model graph = res.getGraph();
+			result.addAll(graph);
+			if (propertiesToFollow != null && level < depth+1) {
+				for (Value prop : propertiesToFollow) {
+					if (prop instanceof URI) {
+						log.debug("Following: " + prop);
+						Model matches = graph.filter((org.openrdf.model.Resource) null, (URI) prop, (Value) null);
+						result.addAll(mergeGraphs(matches.objects(), propertiesToFollow, visited, ++level, depth));
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	private boolean hasAllParameters() {

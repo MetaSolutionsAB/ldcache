@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.entrystore.ldcache.LDCache;
 import org.entrystore.ldcache.util.NS;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -45,7 +46,7 @@ public class BaseResource extends ServerResource {
 
 	int depth;
 
-	Set<URI> follow;
+	Set<Value> follow;
 
 	@Override
 	public void init(Context c, Request request, Response response) {
@@ -95,10 +96,7 @@ public class BaseResource extends ServerResource {
 				follow = new HashSet();
 				String[] followSplitStr = followStr.split(",");
 				for (String s : followSplitStr) {
-					s = NS.expandNS(s.trim());
-					if (!s.contains(":")) {
-						follow.add(new URIImpl(s));
-					}
+					follow.add(new URIImpl(NS.expandNS(s.trim())));
 				}
 			}
 		}
