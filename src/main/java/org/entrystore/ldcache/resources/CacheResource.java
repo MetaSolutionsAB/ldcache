@@ -109,25 +109,39 @@ public class CacheResource extends BaseResource {
 		}
 
 		org.json.JSONArray toAdd = null;
-		try {
-			toAdd = json.getJSONArray("add");
-		} catch (JSONException e) {
-			log.error(e.getMessage());
+		if (json.has("add")) {
+			try {
+				toAdd = json.getJSONArray("add");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
 		}
 		if (toAdd == null) {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return;
 		}
+
 		org.json.JSONArray toFollow = null;
-		try {
-			toFollow = json.getJSONArray("follow");
-		} catch (JSONException e) {
-			log.error(e.getMessage());
+		if (json.has("follow")) {
+			try {
+				toFollow = json.getJSONArray("follow");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
+		}
+
+		int depth = 2;
+		if (json.has("depth")) {
+			try {
+				depth = json.getInt("depth");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
 		}
 
 		// FIXME start a thread to do the following
 
-		cacheResources(jsonArrayToSet(toAdd), jsonArrayToSet(toFollow), 0, 5); // FIXME parameterize maxDepth
+		cacheResources(jsonArrayToSet(toAdd), jsonArrayToSet(toFollow), 0, depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
