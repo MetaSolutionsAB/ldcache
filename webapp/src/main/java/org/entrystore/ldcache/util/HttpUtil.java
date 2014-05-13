@@ -17,30 +17,22 @@
 package org.entrystore.ldcache.util;
 
 import org.apache.log4j.Logger;
-import org.openrdf.model.Graph;
 import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.Uniform;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Preference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
-import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Hannes Ebner
@@ -85,7 +77,7 @@ public class HttpUtil {
 		return response;
 	}
 
-	public static Model getModelFromRespone(Response response) {
+	public static Model getModelFromResponse(Response response) {
 		if (response == null) {
 			throw new IllegalArgumentException();
 		}

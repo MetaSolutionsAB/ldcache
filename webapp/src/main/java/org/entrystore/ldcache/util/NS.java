@@ -44,17 +44,21 @@ public class NS {
 
 	public static String ldc = "http://entrystore.org/ldc/terms/";
 
+	public static String owl = "http://www.w3.org/2002/07/owl#";
+
 	private static HashMap<String, String> map = new HashMap<String, String>();
 
 	static {
 		map.put("dc", NS.dc);
 		map.put("dcterms", NS.dcterms);
+		map.put("dct", NS.dcterms);
 		map.put("foaf", NS.foaf);
 		map.put("rdf", NS.rdf);
 		map.put("rdfs", NS.rdfs);
 		map.put("xsd", NS.xsd);
 		map.put("es", NS.entrystore);
 		map.put("skos", NS.skos);
+		map.put("owl", NS.owl);
 	}
 
 	/**
