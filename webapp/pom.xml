@@ -27,154 +27,154 @@
     <name>LD Cache WebApp</name>
 
     <parent>
-      <groupId>org.entrystore.ldcache</groupId>
-      <artifactId>ldcache-parent</artifactId>
-      <version>0.1-SNAPSHOT</version>
+        <groupId>org.entrystore.ldcache</groupId>
+        <artifactId>ldcache-parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
-        <build>
-                <resources>
-                <resource>
-                                <directory>src/main/resources</directory>
-                        </resource>
-                </resources>
-                <testResources>
-                        <testResource>
-                                <directory>src/test/resources</directory>
-                                <includes>
-                                        <include>**/*.xml</include>
-                                        <include>**/*.properties</include>
-                                </includes>
-                        </testResource>
-                </testResources>
-                <plugins>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-jar-plugin</artifactId>
-                                <executions>
-                                        <execution>
-                                                <id>make-a-jar</id>
-                                                <phase>compile</phase>
-                                                <goals>
-                                                        <goal>jar</goal>
-                                                </goals>
-                                                <configuration>
-                                                        <excludes>
-                                                                <!-- don't store properties in generated jar, only in war -->
-                                                                <exclude>**/entrystore.properties</exclude>
-                                                        </excludes>
-                                                </configuration>
-                                        </execution>
-                                </executions>
-                        </plugin>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-install-plugin</artifactId>
-                                <executions>
-                                        <execution>
-                                                <phase>install</phase>
-                                                <goals>
-                                                        <goal>install-file</goal>
-                                                </goals>
-                                                <configuration>
-                                                        <packaging>jar</packaging>
-                                                        <artifactId>${project.artifactId}</artifactId>
-                                                        <groupId>${project.groupId}</groupId>
-                                                        <version>${project.version}</version>
-                                                        <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
-                                                </configuration>
-                                        </execution>
-                                </executions>
-                        </plugin>
-                </plugins>
-        </build>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-a-jar</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <!-- don't store properties in generated jar, only in war -->
+                                <exclude>**/entrystore.properties</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>jar</packaging>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <groupId>${project.groupId}</groupId>
+                            <version>${project.version}</version>
+                            <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
-		<dependency>
-   			<groupId>org.restlet.jee</groupId>
-   			<artifactId>org.restlet</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.restlet.jee</groupId>
-   			<artifactId>org.restlet.ext.servlet</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.restlet.jse</groupId>
-   			<artifactId>org.restlet.ext.simple</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.restlet.jee</groupId>
-			<artifactId>org.restlet.ext.json</artifactId>
-			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.simpleframework</groupId>
-   			<artifactId>org.simpleframework</artifactId>
-   			<version>4.1.1</version>
-		</dependency>	  
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${servlet.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20131018</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jsonld-java</groupId>
-			<artifactId>jsonld-java-sesame</artifactId>
-			<version>0.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-model</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-rio-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-runtime</artifactId>
-			<version>${sesame.version}</version>
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
+            <version>${restlet.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-model</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+            <version>${restlet.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trig</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.simple</artifactId>
+            <version>${restlet.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-turtle</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
+            <version>${restlet.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-n3</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>org.simpleframework</artifactId>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-rdfxml</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trix</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20131018</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java-sesame</artifactId>
+            <version>0.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openrdf.sesame</groupId>
+                    <artifactId>sesame-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openrdf.sesame</groupId>
+                    <artifactId>sesame-rio-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-runtime</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-model</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-trig</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-turtle</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-n3</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-rdfxml</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-trix</artifactId>
+            <version>${sesame.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
@@ -182,25 +182,25 @@
             <version>${sesame.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-nativerdf</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-nativerdf</artifactId>
+            <version>${sesame.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-memory</artifactId>
-			<version>${sesame.version}</version>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-memory</artifactId>
+            <version>${sesame.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
-		</dependency>
-	</dependencies>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>16.0.1</version>
+        </dependency>
+    </dependencies>
 
 </project>

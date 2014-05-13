@@ -27,57 +27,49 @@
     <name>LD Cache Standalone</name>
 
     <parent>
-      <groupId>org.entrystore.ldcache</groupId>
-      <artifactId>ldcache-parent</artifactId>
-      <version>0.1-SNAPSHOT</version>
+        <groupId>org.entrystore.ldcache</groupId>
+        <artifactId>ldcache-parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
     <build>
         <plugins>
-		<plugin>
-		    <artifactId>maven-compiler-plugin</artifactId>
-		    <configuration>
-		        <source>1.7</source>
-		        <target>1.7</target>
-		        <compilerArgument></compilerArgument>
-		    </configuration>
-		</plugin>
-		<plugin>
-		    <groupId>org.codehaus.mojo</groupId>
-		    <artifactId>appassembler-maven-plugin</artifactId>
-		    <configuration>
-		        <programs>
-				<program>
-				    <mainClass>org.entrystore.ldcache.LDCache</mainClass>
-				    <id>ldc</id>
-				</program>
-		        </programs>
-		        <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
-		        <extraJvmArguments>-Xms256m</extraJvmArguments>
-		    </configuration>
-		    <executions>
-		        <execution>
-				<phase>package</phase>
-				<goals>
-				    <goal>assemble</goal>
-				</goals>
-		        </execution>
-		    </executions>
-		</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <configuration>
+                    <programs>
+                        <program>
+                            <mainClass>org.entrystore.ldcache.LDCache</mainClass>
+                            <id>ldc</id>
+                        </program>
+                    </programs>
+                    <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
+                    <extraJvmArguments>-Xms256m</extraJvmArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <dependencies>
-      <dependency>
-        <groupId>org.entrystore.ldcache</groupId>
-        <artifactId>ldcache-webapp</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>${servlet.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>org.entrystore.ldcache</groupId>
+            <artifactId>ldcache-webapp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
