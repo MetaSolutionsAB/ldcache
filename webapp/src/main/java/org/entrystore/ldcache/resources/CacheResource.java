@@ -28,8 +28,6 @@ import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
-import org.restlet.Client;
-import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
@@ -48,12 +46,6 @@ public class CacheResource extends BaseResource {
 
 	static Logger log = Logger.getLogger(CacheResource.class);
 
-	private Client client;
-
-	private Response clientResponse;
-
-	private Representation input;
-
 	private Cache cache;
 
 	@Get
@@ -64,7 +56,6 @@ public class CacheResource extends BaseResource {
 		}
 		this.cache = getLDCache().getCache();
 
-		Representation output = null;
 		log.info("Received caching request for " + url);
 
 		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, new HashSet<URI>(), 0, depth);
