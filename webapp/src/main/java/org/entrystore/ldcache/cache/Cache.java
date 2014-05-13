@@ -18,6 +18,7 @@ package org.entrystore.ldcache.cache;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
 
 import java.util.Set;
 
@@ -29,5 +30,7 @@ public interface Cache {
 	Model get(URI resourceURI);
 
 	void remove(URI resourceURI);
+
+	Repository getRepository();
 
 }
