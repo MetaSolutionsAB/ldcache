@@ -57,6 +57,9 @@ public class ProxyResource extends BaseResource {
 
 	@Get
 	public Representation represent() {
+
+		// FIXME only allow requests to URLs which are defines in configuration
+
 		if (!hasAllParameters()) {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return null;
