@@ -20,10 +20,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ld-cache</groupId>
-    <artifactId>ld-cache</artifactId>
+    <groupId>org.entrystore.ldcache</groupId>
+    <artifactId>ldcache-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
     <name>LD Cache</name>
+    <packaging>pom</packaging>
 
     <properties>
         <sesame.version>2.7.11</sesame.version>
@@ -31,6 +32,11 @@
 	<restlet.version>2.2.1</restlet.version>
         <servlet.version>3.0.1</servlet.version>
     </properties>
+
+    <modules>
+      <module>standalone</module>
+      <module>webapp</module>
+    </modules>
 
     <developers>
         <developer>
@@ -108,116 +114,10 @@
     </repositories>
 
     <dependencies>
-		<dependency>
-   			<groupId>org.restlet.jee</groupId>
-   			<artifactId>org.restlet</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.restlet.jee</groupId>
-   			<artifactId>org.restlet.ext.servlet</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.restlet.jse</groupId>
-   			<artifactId>org.restlet.ext.simple</artifactId>
-   			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.restlet.jee</groupId>
-			<artifactId>org.restlet.ext.json</artifactId>
-			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-   			<groupId>org.simpleframework</groupId>
-   			<artifactId>org.simpleframework</artifactId>
-   			<version>4.1.1</version>
-		</dependency>	  
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${servlet.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20131018</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jsonld-java</groupId>
-			<artifactId>jsonld-java-sesame</artifactId>
-			<version>0.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-model</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-rio-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-runtime</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-model</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trig</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-turtle</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-n3</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-rdfxml</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-rio-trix</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-rio-rdfjson</artifactId>
-            <version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-nativerdf</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-memory</artifactId>
-			<version>${sesame.version}</version>
-        </dependency>
         <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
 		</dependency>
 	</dependencies>
 
