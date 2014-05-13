@@ -46,7 +46,7 @@ public class NS {
 
 	public static String owl = "http://www.w3.org/2002/07/owl#";
 
-	private static HashMap<String, String> map = new HashMap<String, String>();
+	private static HashMap<String, String> map = new HashMap<>();
 
 	static {
 		map.put("dc", NS.dc);
@@ -59,6 +59,7 @@ public class NS {
 		map.put("es", NS.entrystore);
 		map.put("skos", NS.skos);
 		map.put("owl", NS.owl);
+		map.put("vcard", NS.vcard);
 	}
 
 	/**
