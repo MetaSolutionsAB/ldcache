@@ -20,6 +20,9 @@ import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
 import org.entrystore.ldcache.cache.Resource;
 import org.entrystore.ldcache.util.HttpUtil;
+import org.entrystore.ldcache.util.JsonUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -28,9 +31,14 @@ import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.Sail;
 import org.openrdf.sail.memory.MemoryStore;
+import org.openrdf.sail.nativerdf.NativeStore;
+import org.restlet.data.Status;
 
+import java.io.File;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -44,19 +52,65 @@ public class CacheImpl implements Cache {
 
 	JSONObject config;
 
-	public CacheImpl(JSONObject config) {
+	public CacheImpl(JSONObject config) throws JSONException {
 		this.config = config;
-		this.repository = new SailRepository(new MemoryStore()); // FIXME
+
+		JSONObject repoConfig = config.getJSONObject("repository");
+		String repositoryType = repoConfig.getString("type");
+		Sail sail = null;
+		if ("memory".equalsIgnoreCase(repositoryType)) {
+			sail = new MemoryStore();
+		} else if ("native".equalsIgnoreCase(repositoryType)) {
+			sail = new NativeStore(new File(java.net.URI.create(repoConfig.getString("uri"))));
+		} else {
+			throw new IllegalArgumentException("Invalid repository type");
+		}
+
 		try {
+			this.repository = new SailRepository(sail);
 			repository.initialize();
 		} catch (RepositoryException e) {
 			log.error(e.getMessage());
 		}
+
+		populateDatasets(config.getJSONArray("datasets"));
 	}
 
-	public void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<URI> visited, int level, int depth) {
+	private void populateDatasets(JSONArray datasets) throws JSONException {
+		for (int i = 0; i < datasets.length(); i++) {
+			populateResources(datasets.getJSONObject(i));
+		}
+	}
 
-		// FIXME add smartness to follow rdf:type by fetching the subject instead of the object
+	private void populateResources(JSONObject dataset) throws JSONException {
+		org.json.JSONArray resources = null;
+		if (dataset.has("resources")) {
+			resources = dataset.getJSONArray("resources");
+		}
+
+		org.json.JSONArray follow = null;
+		if (dataset.has("follow")) {
+			follow = dataset.getJSONArray("follow");
+		}
+
+		org.json.JSONArray includeDestinations = null;
+		if (dataset.has("includeDestinations")) {
+			includeDestinations = dataset.getJSONArray("includeDestinations");
+		}
+
+		int followDepth = 2;
+		if (dataset.has("followDepth")) {
+			followDepth = dataset.getInt("followDepth");
+		}
+
+		// FIXME start a thread to do the following
+
+		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
+	}
+
+	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+
+		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
 
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
@@ -67,6 +121,9 @@ public class CacheImpl implements Cache {
 				continue;
 			}
 			visited.add((URI) r);
+
+			// TODO add some delay to not overload the server we fetch from
+
 			Model graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
 			if (graph != null) {
 				RdfResource res = new RdfResource((URI) r, graph, new Date());
@@ -75,9 +132,13 @@ public class CacheImpl implements Cache {
 				if (propertiesToFollow != null && level < depth+1) {
 					for (Value prop : propertiesToFollow) {
 						if (prop instanceof URI) {
+							Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+							objects = filterResources(objects, includeDestinations);
+							if (objects.size() == 0) {
+								continue;
+							}
 							log.debug("Following: " + prop);
-							Model matches = graph.filter(null, (URI) prop, null);
-							loadAndCacheResources(matches.objects(), propertiesToFollow, visited, ++level, depth);
+							loadAndCacheResources(objects, propertiesToFollow, includeDestinations, visited, ++level, depth);
 						}
 					}
 				}
@@ -87,7 +148,10 @@ public class CacheImpl implements Cache {
 		}
 	}
 
-	public Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<URI> visited, int level, int depth) {
+	private Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+
+		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
+
 		Model result = new LinkedHashModel();
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
@@ -108,10 +172,40 @@ public class CacheImpl implements Cache {
 			if (propertiesToFollow != null && level < depth+1) {
 				for (Value prop : propertiesToFollow) {
 					if (prop instanceof URI) {
+						Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+						objects = filterResources(objects, includeDestinations);
+						if (objects.size() == 0) {
+							continue;
+						}
 						log.debug("Following: " + prop);
-						Model matches = graph.filter(null, (URI) prop, null);
-						result.addAll(getMergedGraphs(matches.objects(), propertiesToFollow, visited, ++level, depth));
+						result.addAll(getMergedGraphs(objects, propertiesToFollow, includeDestinations, visited, ++level, depth));
 					}
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth) {
+		loadAndCacheResources(resources, propertiesToFollow, includeDestination, new HashSet<URI>(), 0, depth);
+	}
+
+	@Override
+	public Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth) {
+		return getMergedGraphs(resources, propertiesToFollow, includeDestination, new HashSet<URI>(), 0, depth);
+	}
+
+	public Repository getRepository() {
+		return this.repository;
+	}
+
+	private Set<Value> filterResources(Set<Value> resources, Set<Value> allowedPrefixes) {
+		Set<Value> result = new HashSet<Value>();
+		for (Value v : resources) {
+			for (Value p : allowedPrefixes) {
+				if (v.stringValue().startsWith(p.stringValue())) {
+					result.add(v);
 				}
 			}
 		}

@@ -66,7 +66,7 @@ public class StatusResource extends BaseResource {
 
 	private Set<Resource> getCachedResources() {
 		Set<Resource> result = new HashSet<Resource>();
-		Repository repo = getLDCache().getRepository();
+		Repository repo = getLDCache().getCache().getRepository();
 		RepositoryConnection rc = null;
 		try {
 			rc = repo.getConnection();

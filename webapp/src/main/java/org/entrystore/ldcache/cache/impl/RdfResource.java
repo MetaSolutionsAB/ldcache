@@ -132,6 +132,7 @@ public class RdfResource implements Resource {
 			try {
 				rc = repository.getConnection();
 				rc.begin();
+				rc.remove((org.openrdf.model.Resource) null, (URI) null, (Value) null, resource.getURI());
 				rc.add(resource.getGraph(), resource.getURI());
 				rc.remove(resource.getURI(), Properties.dctModified, null);
 				rc.add(resource.getURI(), Properties.dctModified, Properties.getValueFactory().createLiteral(resource.getModified()));

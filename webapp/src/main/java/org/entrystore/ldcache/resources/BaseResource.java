@@ -44,9 +44,11 @@ public class BaseResource extends ServerResource {
 
 	URI url;
 
-	int depth;
+	int followDepth;
 
 	Set<Value> follow;
+
+	Set<Value> includeDestinations;
 
 	@Override
 	public void init(Context c, Request request, Response response) {
@@ -58,8 +60,9 @@ public class BaseResource extends ServerResource {
 	@Override
 	protected void doRelease() {
 		url = null;
-		depth = 0;
+		followDepth = 0;
 		follow = null;
+		includeDestinations = null;
 	}
 
 	static public HashMap<String, String> parseRequest(String request) {
@@ -101,9 +104,20 @@ public class BaseResource extends ServerResource {
 			}
 		}
 
-		if (parameters.containsKey("depth")) {
+		if (parameters.containsKey("includeDestination")) {
+			String includeDestinationStr = urlDecode(parameters.get("includeDestination"));
+			if (includeDestinationStr != null) {
+				includeDestinations = new HashSet();
+				String[] includeSplitStr = includeDestinationStr.split(",");
+				for (String s : includeSplitStr) {
+					includeDestinations.add(new URIImpl(NS.expandNS(s.trim())));
+				}
+			}
+		}
+
+		if (parameters.containsKey("followDepth")) {
 			try {
-				depth = Integer.valueOf(parameters.get("depth"));
+				followDepth = Integer.valueOf(parameters.get("followDepth"));
 			} catch (NumberFormatException nfe) {
 				log.error(nfe.getMessage());
 			}

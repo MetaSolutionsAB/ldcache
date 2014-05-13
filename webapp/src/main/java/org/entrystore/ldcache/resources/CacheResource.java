@@ -23,7 +23,6 @@ import org.entrystore.ldcache.util.RdfMedia;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -58,7 +57,7 @@ public class CacheResource extends BaseResource {
 
 		log.info("Received caching request for " + url);
 
-		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, new HashSet<URI>(), 0, depth);
+		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, includeDestinations, followDepth);
 		if (resultGraph.size() > 0) {
 			String outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
 			log.debug("Writing content in format " + outputMediaType);
@@ -112,6 +111,15 @@ public class CacheResource extends BaseResource {
 			}
 		}
 
+		org.json.JSONArray includeDestinations = null;
+		if (json.has("includeDestinations")) {
+			try {
+				includeDestinations = json.getJSONArray("includeDestinations");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
+		}
+
 		int depth = 2;
 		if (json.has("depth")) {
 			try {
@@ -123,7 +131,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), new HashSet<URI>(), 0, depth);
+		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonArrayToSet(includeDestinations), depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
