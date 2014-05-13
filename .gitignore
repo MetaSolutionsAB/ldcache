@@ -1,4 +1,5 @@
 .idea
 *.iml
 build.sh
+set-pom-version.sh
 target
