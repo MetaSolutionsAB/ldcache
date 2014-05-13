@@ -20,15 +20,11 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
-import org.entrystore.ldcache.cache.impl.RioCache;
+import org.entrystore.ldcache.cache.impl.CacheImpl;
 import org.entrystore.ldcache.resources.CacheResource;
-import org.entrystore.ldcache.resources.ConfigResource;
-import org.entrystore.ldcache.resources.ProxyResource;
 import org.entrystore.ldcache.resources.StatusResource;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.Context;
@@ -36,6 +32,14 @@ import org.restlet.Restlet;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * EntryStore tools to manipulate Sesame repositories.
@@ -52,18 +56,11 @@ public class LDCache extends Application {
 
 	Cache cache;
 
-	Repository repository;
-
-	public LDCache(Context parentContext) {
+	public LDCache(Context parentContext) throws IOException, JSONException {
 		super(parentContext);
 		getContext().getAttributes().put(KEY, this);
-		cache = new RioCache();
-		repository = new SailRepository(new MemoryStore()); // FIXME
-		try {
-			repository.initialize();
-		} catch (RepositoryException e) {
-			log.error(e.getMessage());
-		}
+		JSONObject config = new JSONObject(new String(Files.readAllBytes(Paths.get(getConfigurationURI("ldcache.json")))));
+		cache = new CacheImpl(config);
 	}
 
 	@Override
@@ -72,8 +69,8 @@ public class LDCache extends Application {
 		router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
 
 		// global scope
-		router.attach("/config", ConfigResource.class);
-		router.attach("/proxy", ProxyResource.class);
+		//router.attach("/config", ConfigResource.class); // TODO
+		//router.attach("/proxy", ProxyResource.class); // FIXME
 		router.attach("/status", StatusResource.class);
 		router.attach("/", CacheResource.class);
 
@@ -86,24 +83,49 @@ public class LDCache extends Application {
 		return this.cache;
 	}
 
-	public Repository getRepository() {
-		return this.repository;
+	public static URI getConfigurationURI(String fileName) {
+		URL resURL = Thread.currentThread().getContextClassLoader().getResource(fileName);
+		try {
+			if (resURL != null) {
+				return resURL.toURI();
+			}
+		} catch (URISyntaxException e) {
+			log.error(e.getMessage());
+		}
+
+		String classPath = System.getProperty("java.class.path");
+		String[] pathElements = classPath.split(System.getProperty("path.separator"));
+		for (String element : pathElements)	{
+			File newFile = new File(element, fileName);
+			if (newFile.exists()) {
+				return newFile.toURI();
+			}
+		}
+		log.error("Unable to find " + fileName + " in classpath");
+		return null;
 	}
 
 	public static void main(String[] args) {
 		BasicConfigurator.configure();
 		Logger.getRootLogger().setLevel(Level.DEBUG);
 
+		int port = 8282;
+		if (args.length > 0) {
+			try {
+				port = Integer.valueOf(args[0]);
+			} catch (NumberFormatException nfe) {
+				log.warn(nfe.getMessage());
+			}
+		}
+
 		Component component = new Component();
-		component.getServers().add(Protocol.HTTP, 8282);
-		component.getClients().add(Protocol.FILE);
+		component.getServers().add(Protocol.HTTP, port);
 		component.getClients().add(Protocol.HTTP);
 		component.getClients().add(Protocol.HTTPS);
 		Context c = component.getContext().createChildContext();
-		LDCache ldc = new LDCache(c);
-		component.getDefaultHost().attach(ldc);
 
 		try {
+			component.getDefaultHost().attach(new LDCache(c));
 			component.start();
 		} catch (Exception e) {
 			e.printStackTrace();
