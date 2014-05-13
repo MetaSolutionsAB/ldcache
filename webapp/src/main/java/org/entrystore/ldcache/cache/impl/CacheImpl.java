@@ -19,22 +19,17 @@ package org.entrystore.ldcache.cache.impl;
 import org.entrystore.ldcache.cache.Cache;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
 
 /**
  * @author Hannes Ebner
  */
-public class RioCache implements Cache {
+public class CacheImpl implements Cache {
 
-	Cache parentCache;
+	Repository repository;
 
-	public RioCache() {
-	}
-
-	public RioCache(Cache parentCache) {
-		if (parentCache == null) {
-			throw new IllegalArgumentException();
-		}
-		this.parentCache = parentCache;
+	public CacheImpl(Repository repository) {
+		this.repository = repository;
 	}
 
 	@Override
@@ -45,6 +40,10 @@ public class RioCache implements Cache {
 	@Override
 	public void remove(URI resourceURI) {
 
+	}
+
+	public Repository getRepository() {
+		return this.repository;
 	}
 
 }
