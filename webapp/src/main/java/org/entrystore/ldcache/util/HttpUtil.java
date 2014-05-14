@@ -31,6 +31,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
+import org.restlet.engine.RestletHelper;
+import org.restlet.engine.connector.HttpClientHelper;
 import org.restlet.representation.Representation;
 
 import java.io.IOException;
@@ -53,11 +55,13 @@ public class HttpUtil {
 		}
 
 		if (client == null) {
-			client = new Client(Protocol.HTTP);
-			client.setContext(new Context());
-			client.getContext().getParameters().add("connectTimeout", "10000");
-			client.getContext().getParameters().add("readTimeout", "15000");
-			client.getContext().getParameters().add("socketConnectTimeoutMs", "10000");
+			Context clientContext = new Context();
+			clientContext.getParameters().set("idleCheckInterval", "10000");
+			clientContext.getParameters().set("connectTimeout", "10000");
+			clientContext.getParameters().set("socketTimeout", "1000");
+			clientContext.getParameters().set("readTimeout", "10000");
+			clientContext.getParameters().set("socketConnectTimeoutMs", "10000");
+			client = new Client(clientContext, Protocol.HTTP);
 			log.debug("Initialized HTTP client");
 		}
 
