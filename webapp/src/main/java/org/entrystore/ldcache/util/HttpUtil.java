@@ -55,8 +55,9 @@ public class HttpUtil {
 		if (client == null) {
 			client = new Client(Protocol.HTTP);
 			client.setContext(new Context());
-			client.getContext().getParameters().add("connectTimeout", "15000");
+			client.getContext().getParameters().add("connectTimeout", "10000");
 			client.getContext().getParameters().add("readTimeout", "15000");
+			client.getContext().getParameters().add("socketConnectTimeoutMs", "10000");
 			log.debug("Initialized HTTP client");
 		}
 
@@ -70,7 +71,7 @@ public class HttpUtil {
 			if (ref != null) {
 				String refURL = ref.getIdentifier();
 				log.info("Request redirected to " + refURL);
-				return getResourceFromURL(refURL, ++loopCount);
+				return getResourceFromURL(refURL, loopCount + 1);
 			}
 		}
 
