@@ -132,4 +132,6 @@ public class LDCache extends Application {
 		}
 	}
 
+	// TODO handle shutdown, i.e., repository, executor in cacheimpl, and probably other stuff
+
 }
