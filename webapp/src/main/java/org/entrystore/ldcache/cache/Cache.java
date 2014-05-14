@@ -21,6 +21,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.repository.Repository;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,9 +29,9 @@ import java.util.Set;
  */
 public interface Cache {
 
-	void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth);
+	void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth);
 
-	Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth);
+	Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth);
 
 	Repository getRepository();
 

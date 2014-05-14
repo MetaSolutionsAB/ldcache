@@ -39,6 +39,7 @@ import org.restlet.data.Status;
 import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -93,6 +94,11 @@ public class CacheImpl implements Cache {
 			follow = dataset.getJSONArray("follow");
 		}
 
+		org.json.JSONArray followTuples = null;
+		if (dataset.has("followTuples")) {
+			followTuples = dataset.getJSONArray("followTuples");
+		}
+
 		org.json.JSONArray includeDestinations = null;
 		if (dataset.has("includeDestinations")) {
 			includeDestinations = dataset.getJSONArray("includeDestinations");
@@ -103,12 +109,12 @@ public class CacheImpl implements Cache {
 			followDepth = dataset.getInt("followDepth");
 		}
 
-		// FIXME start a thread to do the following
+		// TODO start a thread to do the following; thread pool with configurable amount of threads
 
-		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
 	}
 
-	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
 
 		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
 
@@ -120,10 +126,8 @@ public class CacheImpl implements Cache {
 				log.debug("Already visited, skipping: " + r);
 				continue;
 			}
-			visited.add((URI) r);
 
-			// TODO add some delay to not overload the server we fetch from
-
+			HttpUtil.throttle((URI) r);
 			Model graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
 			if (graph != null) {
 				RdfResource res = new RdfResource((URI) r, graph, new Date());
@@ -138,17 +142,18 @@ public class CacheImpl implements Cache {
 								continue;
 							}
 							log.debug("Following: " + prop);
-							loadAndCacheResources(objects, propertiesToFollow, includeDestinations, visited, ++level, depth);
+							loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, ++level, depth);
 						}
 					}
 				}
 			} else {
 				log.error("Model was null for: " + r.toString());
 			}
+			visited.add((URI) r);
 		}
 	}
 
-	private Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+	private Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
 
 		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
 
@@ -169,8 +174,8 @@ public class CacheImpl implements Cache {
 			log.info("Loaded from local repository: " + r);
 			Model graph = res.getGraph();
 			result.addAll(graph);
-			if (propertiesToFollow != null && level < depth+1) {
-				for (Value prop : propertiesToFollow) {
+			if (follow != null && level < depth+1) {
+				for (Value prop : follow) {
 					if (prop instanceof URI) {
 						Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
 						objects = filterResources(objects, includeDestinations);
@@ -178,7 +183,7 @@ public class CacheImpl implements Cache {
 							continue;
 						}
 						log.debug("Following: " + prop);
-						result.addAll(getMergedGraphs(objects, propertiesToFollow, includeDestinations, visited, ++level, depth));
+						result.addAll(getMergedGraphs(objects, follow, followTuples, includeDestinations, visited, ++level, depth));
 					}
 				}
 			}
@@ -187,13 +192,13 @@ public class CacheImpl implements Cache {
 	}
 
 	@Override
-	public void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth) {
-		loadAndCacheResources(resources, propertiesToFollow, includeDestination, new HashSet<URI>(), 0, depth);
+	public void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth) {
+		loadAndCacheResources(resources, follow, followTuples, includeDestination, new HashSet<URI>(), 0, depth);
 	}
 
 	@Override
-	public Model getMergedGraphs(Set<Value> resources, Set<Value> propertiesToFollow, Set<Value> includeDestination, int depth) {
-		return getMergedGraphs(resources, propertiesToFollow, includeDestination, new HashSet<URI>(), 0, depth);
+	public Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth) {
+		return getMergedGraphs(resources, follow, followTuples, includeDestination, new HashSet<URI>(), 0, depth);
 	}
 
 	public Repository getRepository() {
@@ -201,6 +206,9 @@ public class CacheImpl implements Cache {
 	}
 
 	private Set<Value> filterResources(Set<Value> resources, Set<Value> allowedPrefixes) {
+		if (allowedPrefixes.contains("*")) {
+			return resources;
+		}
 		Set<Value> result = new HashSet<Value>();
 		for (Value v : resources) {
 			for (Value p : allowedPrefixes) {
