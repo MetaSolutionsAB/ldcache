@@ -19,10 +19,13 @@ package org.entrystore.ldcache.util;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,6 +47,26 @@ public class JsonUtil {
 			}
 			if (uri != null) {
 				result.add(new URIImpl(uri));
+			}
+		}
+		return result;
+	}
+
+	public static Map<Value, Value> jsonArrayToMap(JSONArray array) {
+		Map<Value, Value> result = new HashMap<>();
+		for (int i = 0; i < array.length(); i++) {
+			try {
+				JSONObject obj = array.getJSONObject(i);
+				if (obj.keys().hasNext()) {
+					String key = (String) obj.keys().next();
+					String value = obj.getString(key);
+					if (key != null && value != null) {
+						result.put(new URIImpl(NS.expandNS(key)), new URIImpl(NS.expandNS(value)));
+					}
+				}
+			} catch (JSONException e) {
+				log.warn(e.getMessage());
+				continue;
 			}
 		}
 		return result;
