@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,6 +62,8 @@ public class CacheImpl implements Cache {
 	com.google.common.cache.Cache<String, RateLimiter> rateLimiters;
 
 	double rateLimit = 2.0;
+
+	ExecutorService executor;
 
 	public CacheImpl(JSONObject config) throws JSONException {
 		this.config = config;
@@ -88,16 +92,39 @@ public class CacheImpl implements Cache {
 		}
 		rateLimiters = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).maximumSize(1000).build();
 
+		int threadPoolSize = 5;
+		if (cacheConfig.has("threadPoolSize")) {
+			threadPoolSize = cacheConfig.getInt("threadPoolSize");
+		}
+		log.info("Creating fixed thread pool with size " + threadPoolSize);
+		executor = Executors.newFixedThreadPool(threadPoolSize);
+
 		populateDatasets(config.getJSONArray("datasets"));
 	}
 
-	private void populateDatasets(JSONArray datasets) throws JSONException {
+	private void populateDatasets(final JSONArray datasets) throws JSONException {
 		for (int i = 0; i < datasets.length(); i++) {
-			populateResources(datasets.getJSONObject(i));
+			final int idx = i;
+			executor.submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						populateResources(datasets.getJSONObject(idx));
+					} catch (JSONException e) {
+						log.error(e.getMessage());
+					}
+				}
+			});
 		}
 	}
 
 	private void populateResources(JSONObject dataset) throws JSONException {
+		String name = "no name found";
+		if (dataset.has("name")) {
+			name = dataset.getString("name");
+		}
+		log.info("Populating dataset: " + name);
+
 		org.json.JSONArray resources = null;
 		if (dataset.has("resources")) {
 			resources = dataset.getJSONArray("resources");
@@ -123,8 +150,6 @@ public class CacheImpl implements Cache {
 			followDepth = dataset.getInt("followDepth");
 		}
 
-		// TODO start a thread to do the following; thread pool with configurable amount of threads
-
 		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
 	}
 
@@ -135,6 +160,11 @@ public class CacheImpl implements Cache {
 			}
 			if (visited.contains(r)) {
 				log.debug("Already visited, skipping: " + r);
+				continue;
+			}
+
+			if (RdfResource.hasResource(repository, (URI) r)) {
+				log.debug("Already in repository, skipping: " + r);
 				continue;
 			}
 
