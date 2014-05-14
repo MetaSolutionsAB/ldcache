@@ -129,9 +129,6 @@ public class CacheImpl implements Cache {
 	}
 
 	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
-
-		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
-
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
 				continue;
@@ -151,6 +148,9 @@ public class CacheImpl implements Cache {
 					for (Value prop : propertiesToFollow) {
 						if (prop instanceof URI) {
 							Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+							if (followTuples != null) {
+								objects.addAll(getMatchingSubjects(graph, followTuples));
+							}
 							objects = filterResources(objects, includeDestinations);
 							if (objects.size() == 0) {
 								continue;
@@ -168,9 +168,6 @@ public class CacheImpl implements Cache {
 	}
 
 	private Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
-
-		// TODO add smartness to follow rdf:type by fetching the subject instead of the object
-
 		Model result = new LinkedHashModel();
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
@@ -192,6 +189,9 @@ public class CacheImpl implements Cache {
 				for (Value prop : follow) {
 					if (prop instanceof URI) {
 						Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+						if (followTuples != null) {
+							objects.addAll(getMatchingSubjects(graph, followTuples));
+						}
 						objects = filterResources(objects, includeDestinations);
 						if (objects.size() == 0) {
 							continue;
@@ -234,6 +234,16 @@ public class CacheImpl implements Cache {
 		return result;
 	}
 
+	private Set<Value> getMatchingSubjects(Model model, Map<Value, Value> tuplesPO) {
+		if (model == null || tuplesPO == null) {
+			throw new IllegalArgumentException();
+		}
+		Set<Value> result = new HashSet<>();
+		for (Value v : tuplesPO.keySet()) {
+			result.addAll(model.filter(null, (URI) v, tuplesPO.get(v)).subjects());
+		}
+		return result;
+	}
 
 	void throttle(URI uri) {
 		String hostname = java.net.URI.create(uri.stringValue()).getHost();
