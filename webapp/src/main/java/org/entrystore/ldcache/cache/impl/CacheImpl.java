@@ -186,12 +186,12 @@ public class CacheImpl implements Cache {
 								continue;
 							}
 							log.debug("Following: " + prop);
-							loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, ++level, depth);
+							loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
 						}
 					}
 				}
 			} else {
-				log.error("Model was null for: " + r.toString());
+				log.warn("Model was null for: " + r.toString());
 			}
 			visited.add((URI) r);
 		}
@@ -253,7 +253,7 @@ public class CacheImpl implements Cache {
 		if (allowedPrefixes.contains("*")) {
 			return resources;
 		}
-		Set<Value> result = new HashSet<Value>();
+		Set<Value> result = new HashSet<>();
 		for (Value v : resources) {
 			for (Value p : allowedPrefixes) {
 				if (v.stringValue().startsWith(p.stringValue())) {
