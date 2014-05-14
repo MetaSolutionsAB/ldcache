@@ -46,7 +46,7 @@ public class JsonUtil {
 				continue;
 			}
 			if (uri != null) {
-				result.add(new URIImpl(uri));
+				result.add(new URIImpl(NS.expandNS(uri)));
 			}
 		}
 		return result;
