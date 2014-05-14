@@ -187,4 +187,26 @@ public class RdfResource implements Resource {
 		}
 	}
 
+	public static boolean hasResource(Repository repository, URI resourceURI) {
+		if (repository == null || resourceURI == null) {
+			throw new IllegalArgumentException();
+		}
+		RepositoryConnection rc = null;
+		try {
+			rc = repository.getConnection();
+			return rc.hasStatement(null, null, null, false, resourceURI);
+		} catch (RepositoryException e) {
+			log.error(e.getMessage());
+		} finally {
+			if (rc != null) {
+				try {
+					rc.close();
+				} catch (RepositoryException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+		return false;
+	}
+
 }
