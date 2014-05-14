@@ -25,6 +25,7 @@ import org.openrdf.model.impl.URIImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,6 +64,24 @@ public class JsonUtil {
 					if (key != null && value != null) {
 						result.put(new URIImpl(NS.expandNS(key)), new URIImpl(NS.expandNS(value)));
 					}
+				}
+			} catch (JSONException e) {
+				log.warn(e.getMessage());
+				continue;
+			}
+		}
+		return result;
+	}
+
+	public static Map<Value, Value> jsonObjectToMap(JSONObject object) {
+		Map<Value, Value> result = new HashMap<>();
+		Iterator it = object.keys();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			try {
+				String value = object.getString(key);
+				if (key != null && value != null) {
+					result.put(new URIImpl(NS.expandNS(key)), new URIImpl(NS.expandNS(value)));
 				}
 			} catch (JSONException e) {
 				log.warn(e.getMessage());

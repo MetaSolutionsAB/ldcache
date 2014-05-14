@@ -108,9 +108,9 @@ public class CacheImpl implements Cache {
 			follow = dataset.getJSONArray("follow");
 		}
 
-		org.json.JSONArray followTuples = null;
+		org.json.JSONObject followTuples = null;
 		if (dataset.has("followTuples")) {
-			followTuples = dataset.getJSONArray("followTuples");
+			followTuples = dataset.getJSONObject("followTuples");
 		}
 
 		org.json.JSONArray includeDestinations = null;
@@ -125,7 +125,7 @@ public class CacheImpl implements Cache {
 
 		// TODO start a thread to do the following; thread pool with configurable amount of threads
 
-		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
 	}
 
 	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {

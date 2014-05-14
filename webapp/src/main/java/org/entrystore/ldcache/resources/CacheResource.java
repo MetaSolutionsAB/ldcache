@@ -111,10 +111,10 @@ public class CacheResource extends BaseResource {
 			}
 		}
 
-		org.json.JSONArray followTuples = null;
+		org.json.JSONObject followTuples = null;
 		if (json.has("followTuples")) {
 			try {
-				followTuples = json.getJSONArray("followTuples");
+				followTuples = json.getJSONObject("followTuples");
 			} catch (JSONException e) {
 				log.error(e.getMessage());
 			}
@@ -140,7 +140,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), depth);
+		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
