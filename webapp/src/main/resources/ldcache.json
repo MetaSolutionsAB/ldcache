@@ -4,7 +4,7 @@
         "uri": "file:///home/hannes/workspace/metasolutions/ldcache/repo/"
     },
     "cache": {
-        "rateLimit": 10
+        "rateLimit": 5
     },
     "datasets": [
         {

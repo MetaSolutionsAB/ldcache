@@ -59,7 +59,7 @@ public class CacheImpl implements Cache {
 
 	com.google.common.cache.Cache<String, RateLimiter> rateLimiters;
 
-	double rateLimit = 10.0;
+	double rateLimit = 2.0;
 
 	public CacheImpl(JSONObject config) throws JSONException {
 		this.config = config;
