@@ -16,6 +16,7 @@
 
 package org.entrystore.ldcache.util;
 
+import com.google.common.util.concurrent.RateLimiter;
 import org.apache.log4j.Logger;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
@@ -34,6 +35,7 @@ import org.restlet.representation.Representation;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author Hannes Ebner
@@ -109,10 +111,6 @@ public class HttpUtil {
 			}
 		}
 		return result;
-	}
-
-	public static void throttle(URI resource) {
-		// TODO calls sleep with respect to amount of requests per server in a specific time period
 	}
 
 }

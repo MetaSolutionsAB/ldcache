@@ -3,6 +3,9 @@
         "type": "native",
         "uri": "file:///home/hannes/workspace/metasolutions/ldcache/repo/"
     },
+    "cache": {
+        "rateLimit": 10
+    },
     "datasets": [
         {
             "name": "dbpedia-laureates",
@@ -25,7 +28,6 @@
                 { "rdf:type": "http://data.nobelprize.org/terms/Laureate" }
             ],
             "includeDestinations": [
-                // "*"
                 "http://dbpedia.org",
                 "http://data.nobelprize.org"
             ],

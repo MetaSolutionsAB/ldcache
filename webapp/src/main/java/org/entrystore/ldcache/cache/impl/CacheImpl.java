@@ -16,6 +16,8 @@
 
 package org.entrystore.ldcache.cache.impl;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.RateLimiter;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
 import org.entrystore.ldcache.cache.Resource;
@@ -34,13 +36,15 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.memory.MemoryStore;
 import org.openrdf.sail.nativerdf.NativeStore;
-import org.restlet.data.Status;
 
 import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Hannes Ebner
@@ -52,6 +56,10 @@ public class CacheImpl implements Cache {
 	Repository repository;
 
 	JSONObject config;
+
+	com.google.common.cache.Cache<String, RateLimiter> rateLimiters;
+
+	double rateLimit = 10.0;
 
 	public CacheImpl(JSONObject config) throws JSONException {
 		this.config = config;
@@ -73,6 +81,12 @@ public class CacheImpl implements Cache {
 		} catch (RepositoryException e) {
 			log.error(e.getMessage());
 		}
+
+		JSONObject cacheConfig = config.getJSONObject("cache");
+		if (cacheConfig.has("rateLimit")) {
+			rateLimit = cacheConfig.getDouble("rateLimit");
+		}
+		rateLimiters = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).maximumSize(1000).build();
 
 		populateDatasets(config.getJSONArray("datasets"));
 	}
@@ -127,7 +141,7 @@ public class CacheImpl implements Cache {
 				continue;
 			}
 
-			HttpUtil.throttle((URI) r);
+			throttle((URI) r);
 			Model graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
 			if (graph != null) {
 				RdfResource res = new RdfResource((URI) r, graph, new Date());
@@ -218,6 +232,21 @@ public class CacheImpl implements Cache {
 			}
 		}
 		return result;
+	}
+
+
+	void throttle(URI uri) {
+		String hostname = java.net.URI.create(uri.stringValue()).getHost();
+		try {
+			rateLimiters.get(hostname, new Callable<RateLimiter>() {
+				@Override
+				public RateLimiter call() throws Exception {
+					return RateLimiter.create(rateLimit);
+				}
+			}).acquire();
+		} catch (ExecutionException e) {
+			log.error(e.getMessage());
+		}
 	}
 
 }
