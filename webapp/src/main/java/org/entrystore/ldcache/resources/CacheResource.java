@@ -57,7 +57,7 @@ public class CacheResource extends BaseResource {
 
 		log.info("Received caching request for " + url);
 
-		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, includeDestinations, followDepth);
+		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, followTuples, includeDestinations, followDepth);
 		if (resultGraph.size() > 0) {
 			String outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
 			log.debug("Writing content in format " + outputMediaType);
@@ -111,6 +111,15 @@ public class CacheResource extends BaseResource {
 			}
 		}
 
+		org.json.JSONArray followTuples = null;
+		if (json.has("followTuples")) {
+			try {
+				followTuples = json.getJSONArray("followTuples");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
+		}
+
 		org.json.JSONArray includeDestinations = null;
 		if (json.has("includeDestinations")) {
 			try {
@@ -131,7 +140,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonArrayToSet(includeDestinations), depth);
+		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}

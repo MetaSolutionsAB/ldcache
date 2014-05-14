@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,6 +49,8 @@ public class BaseResource extends ServerResource {
 
 	Set<Value> follow;
 
+	Map<Value, Value> followTuples;
+
 	Set<Value> includeDestinations;
 
 	@Override
@@ -62,6 +65,7 @@ public class BaseResource extends ServerResource {
 		url = null;
 		followDepth = 0;
 		follow = null;
+		followTuples = null;
 		includeDestinations = null;
 	}
 
@@ -104,11 +108,23 @@ public class BaseResource extends ServerResource {
 			}
 		}
 
-		if (parameters.containsKey("includeDestination")) {
-			String includeDestinationStr = urlDecode(parameters.get("includeDestination"));
-			if (includeDestinationStr != null) {
+		if (parameters.containsKey("followTuples")) {
+			String followTupleStr = urlDecode(parameters.get("followTuples"));
+			if (followTupleStr != null) {
+				followTuples = new HashMap<>();
+				String[] followTupleSplitStr = followTupleStr.split(",");
+				for (String s : followTupleSplitStr) {
+					String[] tuple = s.split("|");
+					followTuples.put(new URIImpl(NS.expandNS(tuple[0])), new URIImpl(NS.expandNS(tuple[1])));
+				}
+			}
+		}
+
+		if (parameters.containsKey("includeDestinations")) {
+			String includeDestinationsStr = urlDecode(parameters.get("includeDestinations"));
+			if (includeDestinationsStr != null) {
 				includeDestinations = new HashSet();
-				String[] includeSplitStr = includeDestinationStr.split(",");
+				String[] includeSplitStr = includeDestinationsStr.split(",");
 				for (String s : includeSplitStr) {
 					includeDestinations.add(new URIImpl(NS.expandNS(s.trim())));
 				}
