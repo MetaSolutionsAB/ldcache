@@ -43,4 +43,6 @@ public class ConfigResource extends BaseResource {
 
 	Logger log = Logger.getLogger(ConfigResource.class);
 
+	// TODO make it possible to run PUT on /config to initialize LDC
+
 }
