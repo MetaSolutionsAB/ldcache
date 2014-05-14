@@ -18,6 +18,7 @@ package org.entrystore.ldcache.util;
 
 import org.apache.log4j.Logger;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -108,6 +109,10 @@ public class HttpUtil {
 			}
 		}
 		return result;
+	}
+
+	public static void throttle(URI resource) {
+		// TODO calls sleep with respect to amount of requests per server in a specific time period
 	}
 
 }
