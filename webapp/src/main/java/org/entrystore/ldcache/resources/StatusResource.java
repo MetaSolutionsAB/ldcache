@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -54,7 +53,9 @@ public class StatusResource extends BaseResource {
 		sb.append("<html>\n<head>\n<title>Linked Data Cache Status</title>\n</head>\n<body>\n");
 		sb.append("<h3>Linked Data Cache Status</h3>\n");
 		Set<Resource> cached = getCachedResources();
-		sb.append("Number of resources cached: ").append(cached.size()).append("<br/>\n");
+		sb.append("Cached resources: ").append(cached.size()).append("<br/>\n");
+		sb.append("Triples: ").append(getTripleCount()).append("<br/>\n");
+		sb.append("Named graphs: ").append(getContextCount()).append("<br/>\n");
 		sb.append("<pre>\n");
 		for (Resource r : cached) {
 			sb.append("<a href=\"").append(r).append("\">").append(r).append("</a>\n");
@@ -73,6 +74,52 @@ public class StatusResource extends BaseResource {
 			RepositoryResult<Resource> rr = rc.getContextIDs();
 			while (rr.hasNext()) {
 				result.add(rr.next());
+			}
+		} catch (RepositoryException re) {
+			log.error(re.getMessage());
+		} finally {
+			if (rc != null) {
+				try {
+					rc.close();
+				} catch (RepositoryException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+		return result;
+	}
+
+	private long getTripleCount() {
+		long result = 0;
+		Repository repo = getLDCache().getCache().getRepository();
+		RepositoryConnection rc = null;
+		try {
+			rc = repo.getConnection();
+			result = rc.size();
+		} catch (RepositoryException re) {
+			log.error(re.getMessage());
+		} finally {
+			if (rc != null) {
+				try {
+					rc.close();
+				} catch (RepositoryException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+		return result;
+	}
+
+	private long getContextCount() {
+		long result = 0;
+		Repository repo = getLDCache().getCache().getRepository();
+		RepositoryConnection rc = null;
+		try {
+			rc = repo.getConnection();
+			RepositoryResult<Resource> rr = rc.getContextIDs();
+			while (rr.hasNext()) {
+				rr.next();
+				result++;
 			}
 		} catch (RepositoryException re) {
 			log.error(re.getMessage());
