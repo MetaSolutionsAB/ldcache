@@ -1,17 +1,17 @@
 {
     "repository": {
         "type": "native",
-        "uri": "file:///home/hannes/workspace/metasolutions/ldcache/repo/"
+        "uri": "file:///srv/ldcache/repository/"
     },
     "cache": {
-        "rateLimit": 5
+        "rateLimit": 5,
+        "threadPoolSize": 5
     },
     "datasets": [
         {
             "name": "dbpedia-laureates",
             "resources": [
-                "http://data.nobelprize.org/all/laureate?output=ttl",
-                "http://dbpedia.org/resource/Marie_Curie"
+                "http://data.nobelprize.org/all/laureate"
             ],
             "follow": [
                 "http://dbpedia.org/property/doctoralAdvisor",
@@ -31,7 +31,7 @@
                 "http://dbpedia.org",
                 "http://data.nobelprize.org"
             ],
-            "followDepth": 2
+            "followDepth": 3
         }
     ]
 }
