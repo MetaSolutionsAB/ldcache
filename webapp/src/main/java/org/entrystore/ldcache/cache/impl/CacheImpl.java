@@ -147,7 +147,7 @@ public class CacheImpl implements Cache {
 				if (propertiesToFollow != null && level < depth+1) {
 					for (Value prop : propertiesToFollow) {
 						if (prop instanceof URI) {
-							Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+							Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
 							if (followTuples != null) {
 								objects.addAll(getMatchingSubjects(graph, followTuples));
 							}
@@ -188,7 +188,7 @@ public class CacheImpl implements Cache {
 			if (follow != null && level < depth+1) {
 				for (Value prop : follow) {
 					if (prop instanceof URI) {
-						Set<Value> objects = graph.filter(null, (URI) prop, null).objects();
+						Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
 						if (followTuples != null) {
 							objects.addAll(getMatchingSubjects(graph, followTuples));
 						}
