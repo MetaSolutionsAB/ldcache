@@ -11,6 +11,7 @@
                 "http://dbpedia.org/resource/Marie_Curie"
             ],
             "follow": [
+                "http://dbpedia.org/property/doctoralAdvisor",
                 "http://dbpedia.org/property/doctoralStudents",
                 "http://dbpedia.org/property/field",
                 "http://dbpedia.org/ontology/knownFor",
@@ -20,7 +21,11 @@
                 "rdf:type",
                 "owl:sameAs"
             ],
+            "followTuples": [
+                { "rdf:type": "http://data.nobelprize.org/terms/Laureate" }
+            ],
             "includeDestinations": [
+                // "*"
                 "http://dbpedia.org",
                 "http://data.nobelprize.org"
             ],
