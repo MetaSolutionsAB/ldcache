@@ -1,11 +1,12 @@
 {
     "repository": {
-        "type": "native",
+        "type": "memory",
         "uri": "file:///srv/ldcache/repository/"
     },
     "cache": {
-        "rateLimit": 5,
-        "threadPoolSize": 5
+        "rateLimit": 10,
+        "threadPoolSize": 5,
+        "requestTimeout": 10000
     },
     "datasets": [
         {
@@ -14,21 +15,16 @@
                 "http://data.nobelprize.org/all/laureate"
             ],
             "follow": [
-                "http://dbpedia.org/property/doctoralAdvisor",
-                "http://dbpedia.org/property/doctoralStudents",
-                "http://dbpedia.org/property/field",
-                "http://dbpedia.org/ontology/knownFor",
-                "http://dbpedia.org/ontology/almaMater",
-                "http://dbpedia.org/ontology/award",
-                "dcterms:subject",
-                "rdf:type",
+                "http://dbpedia.org/ontology/affiliation",
+                "http://dbpedia.org/ontology/birthPlace",
+                "http://dbpedia.org/ontology/deathPlace",
                 "owl:sameAs"
             ],
             "followTuples": {
                 "rdf:type": "http://data.nobelprize.org/terms/Laureate"
             },
             "includeDestinations": [
-                "http://dbpedia.org",
+                "http://dbpedia.org/resource/",
                 "http://data.nobelprize.org"
             ],
             "followDepth": 3
