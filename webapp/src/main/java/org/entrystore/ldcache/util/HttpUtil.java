@@ -16,10 +16,8 @@
 
 package org.entrystore.ldcache.util;
 
-import com.google.common.util.concurrent.RateLimiter;
 import org.apache.log4j.Logger;
 import org.openrdf.model.Model;
-import org.openrdf.model.URI;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -31,13 +29,11 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
-import org.restlet.engine.RestletHelper;
-import org.restlet.engine.connector.HttpClientHelper;
 import org.restlet.representation.Representation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * @author Hannes Ebner
@@ -48,29 +44,35 @@ public class HttpUtil {
 
 	private static Client client;
 
+	static {
+		Context clientContext = new Context();
+		client = new Client(clientContext, Arrays.asList(Protocol.HTTP, Protocol.HTTPS));
+		setTimeouts(10000);
+		log.debug("Initialized HTTP client");
+	}
+
 	public static Response getResourceFromURL(String url, int loopCount) {
 		if (loopCount > 10) {
 			log.warn("More than 10 redirect loops detected, aborting");
 			return null;
 		}
 
-		if (client == null) {
-			Context clientContext = new Context();
-			clientContext.getParameters().set("idleCheckInterval", "10000");
-			clientContext.getParameters().set("connectTimeout", "10000");
-			clientContext.getParameters().set("socketTimeout", "1000");
-			clientContext.getParameters().set("readTimeout", "10000");
-			clientContext.getParameters().set("socketConnectTimeoutMs", "10000");
-			client = new Client(clientContext, Protocol.HTTP);
-			log.debug("Initialized HTTP client");
-		}
-
 		Request request = new Request(Method.GET, url);
 		request.getClientInfo().setAcceptedMediaTypes(RdfMedia.RDF_FORMATS);
 		Response response = client.handle(request);
 
+		// Alternative to calling the client directly:
+		// HttpClientHelper helper = new HttpClientHelper(client);
+		// Response response = new Response(request);
+		// helper.handle(request, response);
+
 		if (response.getStatus().isRedirection()) {
 			Reference ref = response.getLocationRef();
+			try {
+				response.getEntity().exhaust();
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 			response.getEntity().release();
 			if (ref != null) {
 				String refURL = ref.getIdentifier();
@@ -88,6 +90,10 @@ public class HttpUtil {
 	public static Model getModelFromResponse(Response response) {
 		if (response == null) {
 			throw new IllegalArgumentException();
+		}
+		if (response.getStatus().isError()) {
+			log.warn("Skipping response due to error status");
+			return null;
 		}
 		Model result = null;
 		Representation input = response.getEntity();
@@ -116,6 +122,14 @@ public class HttpUtil {
 			}
 		}
 		return result;
+	}
+
+	public static void setTimeouts(long timeout) {
+		String timeoutStr = Long.toString(timeout);
+		client.getContext().getParameters().set("connectTimeout", timeoutStr);
+		client.getContext().getParameters().set("socketTimeout", timeoutStr);
+		client.getContext().getParameters().set("readTimeout", timeoutStr);
+		client.getContext().getParameters().set("socketConnectTimeoutMs", timeoutStr);
 	}
 
 }

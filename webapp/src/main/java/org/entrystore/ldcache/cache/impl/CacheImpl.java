@@ -99,6 +99,12 @@ public class CacheImpl implements Cache {
 		log.info("Creating fixed thread pool with size " + threadPoolSize);
 		executor = Executors.newFixedThreadPool(threadPoolSize);
 
+		if (cacheConfig.has("requestTimeout")) {
+			long timeout = cacheConfig.getLong("requestTimeout");
+			log.info("Setting request timeout to " + timeout);
+			HttpUtil.setTimeouts(timeout);
+		}
+
 		populateDatasets(config.getJSONArray("datasets"));
 	}
 
