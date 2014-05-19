@@ -35,6 +35,8 @@ import org.restlet.resource.Post;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -59,7 +61,16 @@ public class CacheResource extends BaseResource {
 
 		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, followTuples, includeDestinations, followDepth);
 		if (resultGraph.size() > 0) {
-			String outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
+			String outputMediaType = null;
+			if (parameters.containsKey("format")) {
+				outputMediaType = parameters.get("format");
+			}
+			if (outputMediaType == null) {
+				outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
+			}
+			if (outputMediaType == null) {
+				outputMediaType = "application/rdf+xml";
+			}
 			log.debug("Writing content in format " + outputMediaType);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try {
