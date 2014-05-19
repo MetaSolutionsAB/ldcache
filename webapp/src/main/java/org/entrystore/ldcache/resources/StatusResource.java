@@ -52,15 +52,19 @@ public class StatusResource extends BaseResource {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<html>\n<head>\n<title>Linked Data Cache Status</title>\n</head>\n<body>\n");
 		sb.append("<h3>Linked Data Cache Status</h3>\n");
+		/*
 		Set<Resource> cached = getCachedResources();
 		sb.append("Cached resources: ").append(cached.size()).append("<br/>\n");
+		*/
 		sb.append("Triples: ").append(getTripleCount()).append("<br/>\n");
 		sb.append("Named graphs: ").append(getContextCount()).append("<br/>\n");
+		/*
 		sb.append("<pre>\n");
 		for (Resource r : cached) {
 			sb.append("<a href=\"").append(r).append("\">").append(r).append("</a>\n");
 		}
 		sb.append("</pre>\n");
+		*/
 		sb.append("</body>\n</html>");
 		return new StringRepresentation(sb.toString(), MediaType.TEXT_HTML);
 	}
