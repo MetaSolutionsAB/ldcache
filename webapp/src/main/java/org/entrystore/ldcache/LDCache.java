@@ -57,10 +57,23 @@ public class LDCache extends Application {
 	Cache cache;
 
 	public LDCache(Context parentContext) throws IOException, JSONException {
+		this(parentContext, null);
+	}
+
+	public LDCache(Context parentContext, URI configURI) throws IOException, JSONException {
 		super(parentContext);
 		getContext().getAttributes().put(KEY, this);
-		JSONObject config = new JSONObject(new String(Files.readAllBytes(Paths.get(getConfigurationURI("ldcache.json")))));
-		cache = new CacheImpl(config);
+		if (configURI == null) {
+			configURI = getConfigurationURI("ldcache.json");
+		}
+
+		if (configURI != null && "file".equals(configURI.getScheme())) {
+			JSONObject config = new JSONObject(new String(Files.readAllBytes(Paths.get(configURI))));
+			cache = new CacheImpl(config);
+		} else {
+			log.error("No configuration found");
+			System.exit(1);
+		}
 	}
 
 	@Override
@@ -110,12 +123,26 @@ public class LDCache extends Application {
 		Logger.getRootLogger().setLevel(Level.DEBUG);
 
 		int port = 8282;
+		URI configURI = null;
+
 		if (args.length > 0) {
+			configURI = new File(args[0]).toURI();
+		}
+
+		if (args.length > 1) {
 			try {
 				port = Integer.valueOf(args[0]);
 			} catch (NumberFormatException nfe) {
-				log.warn(nfe.getMessage());
+				System.err.println(nfe.getMessage());
 			}
+		}
+
+		if (configURI == null) {
+			System.out.println("LDCache - http://bitbucket.org/metasolutions/ldcache");
+			System.out.println("");
+			System.out.println("Usage: ldc <path to configuration file> [listening port]");
+			System.out.println("");
+			System.exit(1);
 		}
 
 		Component component = new Component();
@@ -125,7 +152,7 @@ public class LDCache extends Application {
 		Context c = component.getContext().createChildContext();
 
 		try {
-			component.getDefaultHost().attach(new LDCache(c));
+			component.getDefaultHost().attach(new LDCache(c, configURI));
 			component.start();
 		} catch (Exception e) {
 			e.printStackTrace();
