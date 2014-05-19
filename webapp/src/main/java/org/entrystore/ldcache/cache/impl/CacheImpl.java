@@ -169,7 +169,8 @@ public class CacheImpl implements Cache {
 				continue;
 			}
 
-			if (RdfResource.hasResource(repository, (URI) r)) {
+			// level > 0 to be able to re-run from index resources
+			if (level > 0 && RdfResource.hasResource(repository, (URI) r)) {
 				log.debug("Already in repository, skipping: " + r);
 				continue;
 			}
