@@ -1,7 +1,8 @@
 {
     "repository": {
         "type": "memory",
-        "uri": "file:///srv/ldcache/repository/"
+        "uri": "file:///srv/ldcache/repository/",
+        "indexes": "cspo,posc,spoc"
     },
     "cache": {
         "rateLimit": 10,

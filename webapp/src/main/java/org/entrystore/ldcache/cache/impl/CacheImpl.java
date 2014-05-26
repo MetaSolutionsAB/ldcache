@@ -70,11 +70,15 @@ public class CacheImpl implements Cache {
 
 		JSONObject repoConfig = config.getJSONObject("repository");
 		String repositoryType = repoConfig.getString("type");
+		String indexes = repoConfig.getString("indexes");
 		Sail sail = null;
 		if ("memory".equalsIgnoreCase(repositoryType)) {
 			sail = new MemoryStore();
 		} else if ("native".equalsIgnoreCase(repositoryType)) {
 			sail = new NativeStore(new File(java.net.URI.create(repoConfig.getString("uri"))));
+			if (indexes != null && indexes.trim().length() > 3) {
+				((NativeStore) sail).setTripleIndexes(indexes);
+			}
 		} else {
 			throw new IllegalArgumentException("Invalid repository type");
 		}
