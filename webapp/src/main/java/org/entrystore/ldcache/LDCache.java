@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
 import org.entrystore.ldcache.cache.impl.CacheImpl;
 import org.entrystore.ldcache.resources.CacheResource;
+import org.entrystore.ldcache.resources.ProxyResource;
 import org.entrystore.ldcache.resources.StatusResource;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,6 +57,8 @@ public class LDCache extends Application {
 
 	Cache cache;
 
+	JSONObject config;
+
 	public LDCache(Context parentContext) throws IOException, JSONException {
 		this(parentContext, null);
 	}
@@ -68,7 +71,7 @@ public class LDCache extends Application {
 		}
 
 		if (configURI != null && "file".equals(configURI.getScheme())) {
-			JSONObject config = new JSONObject(new String(Files.readAllBytes(Paths.get(configURI))));
+			config = new JSONObject(new String(Files.readAllBytes(Paths.get(configURI))));
 			cache = new CacheImpl(config);
 		} else {
 			log.error("No configuration found");
@@ -79,11 +82,16 @@ public class LDCache extends Application {
 	@Override
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
-		router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
+		router.setDefaultMatchingMode(Template.MODE_EQUALS);
 
 		// global scope
 		//router.attach("/config", ConfigResource.class); // TODO
-		//router.attach("/proxy", ProxyResource.class); // FIXME
+		if (isProxyEnabled()) {
+			router.attach("/proxy", ProxyResource.class);
+			log.info("Proxy enabled");
+		} else {
+			log.info("Proxy disabled");
+		}
 		router.attach("/status", StatusResource.class);
 		router.attach("/", CacheResource.class);
 
@@ -116,6 +124,17 @@ public class LDCache extends Application {
 		}
 		log.error("Unable to find " + fileName + " in classpath");
 		return null;
+	}
+
+	private boolean isProxyEnabled() {
+		try {
+			if (config != null) {
+				return config.getJSONObject("proxy").getBoolean("enabled");
+			}
+		} catch (JSONException e) {
+			log.error(e.getMessage());
+		}
+		return false;
 	}
 
 	public static void main(String[] args) {

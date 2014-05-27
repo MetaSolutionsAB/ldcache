@@ -9,6 +9,9 @@
         "threadPoolSize": 5,
         "requestTimeout": 10000
     },
+    "proxy": {
+        "enabled": false
+    },
     "datasets": [
         {
             "name": "dbpedia-laureates",

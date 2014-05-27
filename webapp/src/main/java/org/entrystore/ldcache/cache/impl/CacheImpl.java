@@ -185,7 +185,7 @@ public class CacheImpl implements Cache {
 				RdfResource res = new RdfResource((URI) r, graph, new Date());
 				RdfResource.saveToRepository(this.repository, res);
 				log.info("Cached in local repository: " + r);
-				if (propertiesToFollow != null && level < depth+1) {
+				if (propertiesToFollow != null && level < depth) {
 					for (Value prop : propertiesToFollow) {
 						if (prop instanceof URI) {
 							Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());

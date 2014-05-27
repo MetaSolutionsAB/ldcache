@@ -58,7 +58,7 @@ public class ProxyResource extends BaseResource {
 	@Get
 	public Representation represent() {
 
-		// FIXME only allow requests to URLs which are defines in configuration
+		// FIXME only allow requests to URLs which are defined in configuration
 
 		if (!hasAllParameters()) {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
@@ -113,7 +113,7 @@ public class ProxyResource extends BaseResource {
 						try {
 							Rio.write(deserializedGraph, baos, rdfFormat);
 						} catch (RDFHandlerException e) {
-							log.error("RDF handler " + e.getMessage());
+							log.error(e.getMessage());
 						}
 						output = new ByteArrayRepresentation(baos.toByteArray());
 					}
