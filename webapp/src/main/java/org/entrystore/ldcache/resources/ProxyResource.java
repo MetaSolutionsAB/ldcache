@@ -107,7 +107,16 @@ public class ProxyResource extends BaseResource {
 					}
 
 					if (deserializedGraph != null) {
-						String outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
+						String outputMediaType = null;
+						if (parameters.containsKey("format")) {
+							outputMediaType = parameters.get("format");
+						}
+						if (outputMediaType == null) {
+							outputMediaType = getRequest().getClientInfo().getPreferredMediaType(RdfMedia.SUPPORTED_MEDIA_TYPES).getName();
+						}
+						if (outputMediaType == null) {
+							outputMediaType = "application/rdf+xml";
+						}
 						log.debug("Writing content in format " + outputMediaType);
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						try {
