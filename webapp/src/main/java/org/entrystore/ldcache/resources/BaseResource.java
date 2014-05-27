@@ -51,7 +51,7 @@ public class BaseResource extends ServerResource {
 
 	Map<Value, Value> followTuples;
 
-	Set<Value> includeDestinations;
+	Set<String> includeDestinations;
 
 	@Override
 	public void init(Context c, Request request, Response response) {
@@ -120,15 +120,19 @@ public class BaseResource extends ServerResource {
 			}
 		}
 
+		includeDestinations = new HashSet();
 		if (parameters.containsKey("includeDestinations")) {
 			String includeDestinationsStr = urlDecode(parameters.get("includeDestinations"));
 			if (includeDestinationsStr != null) {
-				includeDestinations = new HashSet();
 				String[] includeSplitStr = includeDestinationsStr.split(",");
 				for (String s : includeSplitStr) {
-					includeDestinations.add(new URIImpl(NS.expandNS(s.trim())));
+					includeDestinations.add(NS.expandNS(s.trim()));
 				}
 			}
+		}
+		// default is "all destinations allowed"
+		if (includeDestinations.size() == 0) {
+			includeDestinations.add("*");
 		}
 
 		if (parameters.containsKey("followDepth")) {

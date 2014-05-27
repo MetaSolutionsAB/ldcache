@@ -29,9 +29,9 @@ import java.util.Set;
  */
 public interface Cache {
 
-	void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth);
+	void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth);
 
-	Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth);
+	Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth);
 
 	Repository getRepository();
 

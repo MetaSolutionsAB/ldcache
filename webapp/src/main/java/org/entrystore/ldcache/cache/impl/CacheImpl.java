@@ -160,10 +160,10 @@ public class CacheImpl implements Cache {
 			followDepth = dataset.getInt("followDepth");
 		}
 
-		loadAndCacheResources(JsonUtil.jsonArrayToSet(resources), JsonUtil.jsonArrayToSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
 	}
 
-	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
 				continue;
@@ -208,7 +208,7 @@ public class CacheImpl implements Cache {
 		}
 	}
 
-	private Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestinations, Set<URI> visited, int level, int depth) {
+	private Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
 		Model result = new LinkedHashModel();
 		for (Value r : resources) {
 			if (!(r instanceof URI)) {
@@ -247,27 +247,30 @@ public class CacheImpl implements Cache {
 	}
 
 	@Override
-	public void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth) {
-		loadAndCacheResources(resources, follow, followTuples, includeDestination, new HashSet<URI>(), 0, depth);
+	public void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth) {
+		loadAndCacheResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
 	}
 
 	@Override
-	public Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<Value> includeDestination, int depth) {
-		return getMergedGraphs(resources, follow, followTuples, includeDestination, new HashSet<URI>(), 0, depth);
+	public Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth) {
+		return getMergedGraphs(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
 	}
 
 	public Repository getRepository() {
 		return this.repository;
 	}
 
-	private Set<Value> filterResources(Set<Value> resources, Set<Value> allowedPrefixes) {
+	private Set<Value> filterResources(Set<Value> resources, Set<String> allowedPrefixes) {
+		if (resources == null || allowedPrefixes == null) {
+			throw new IllegalArgumentException("Parameters must not be null");
+		}
 		if (allowedPrefixes.contains("*")) {
 			return resources;
 		}
 		Set<Value> result = new HashSet<>();
 		for (Value v : resources) {
-			for (Value p : allowedPrefixes) {
-				if (v.stringValue().startsWith(p.stringValue())) {
+			for (String p : allowedPrefixes) {
+				if (v.stringValue().startsWith(p)) {
 					result.add(v);
 				}
 			}

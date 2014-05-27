@@ -36,7 +36,7 @@ public class JsonUtil {
 
 	static Logger log = Logger.getLogger(JsonUtil.class);
 
-	public static Set<Value> jsonArrayToSet(JSONArray array) {
+	public static Set<Value> jsonArrayToValueSet(JSONArray array) {
 		Set<Value> result = new HashSet<Value>();
 		for (int i = 0; i < array.length(); i++) {
 			String uri = null;
@@ -48,6 +48,23 @@ public class JsonUtil {
 			}
 			if (uri != null) {
 				result.add(new URIImpl(NS.expandNS(uri)));
+			}
+		}
+		return result;
+	}
+
+	public static Set<String> jsonArrayToStringSet(JSONArray array) {
+		Set<String> result = new HashSet();
+		for (int i = 0; i < array.length(); i++) {
+			String uri = null;
+			try {
+				uri = array.getString(i);
+			} catch (JSONException e) {
+				log.warn(e.getMessage());
+				continue;
+			}
+			if (uri != null) {
+				result.add(NS.expandNS(uri));
 			}
 		}
 		return result;

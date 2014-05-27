@@ -35,8 +35,6 @@ import org.restlet.resource.Post;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -151,7 +149,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cache.loadAndCacheResources(JsonUtil.jsonArrayToSet(toAdd), JsonUtil.jsonArrayToSet(toFollow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToSet(includeDestinations), depth);
+		cache.loadAndCacheResources(JsonUtil.jsonArrayToValueSet(toAdd), JsonUtil.jsonArrayToValueSet(toFollow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
