@@ -120,7 +120,7 @@ public class ProxyResource extends BaseResource {
 						log.debug("Writing content in format " + outputMediaType);
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						try {
-							Rio.write(deserializedGraph, baos, rdfFormat);
+							Rio.write(deserializedGraph, baos, RDFFormat.forMIMEType(outputMediaType));
 						} catch (RDFHandlerException e) {
 							log.error(e.getMessage());
 						}
