@@ -1,1 +1,7 @@
 .idea
+pom.xml.versionsBackup
+*.iml
+build.sh
+set-pom-version.sh
+target
+webapp/src/main/resources/ldcache.json
