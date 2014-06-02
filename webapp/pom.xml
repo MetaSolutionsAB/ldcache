@@ -23,13 +23,13 @@
     <groupId>org.entrystore.ldcache</groupId>
     <artifactId>ldcache-webapp</artifactId>
     <packaging>war</packaging>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>LD Cache WebApp</name>
 
     <parent>
         <groupId>org.entrystore.ldcache</groupId>
         <artifactId>ldcache-parent</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
 
     <build>

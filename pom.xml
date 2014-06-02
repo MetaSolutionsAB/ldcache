@@ -22,7 +22,7 @@
 
     <groupId>org.entrystore.ldcache</groupId>
     <artifactId>ldcache-parent</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>LD Cache</name>
     <packaging>pom</packaging>
 
