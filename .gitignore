@@ -1,4 +1,5 @@
 .idea
+pom.xml.versionsBackup
 *.iml
 build.sh
 set-pom-version.sh
