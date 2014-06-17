@@ -27,7 +27,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <sesame.version>2.7.11</sesame.version>
+        <sesame.version>2.7.12</sesame.version>
         <slf4j.version>1.7.5</slf4j.version>
         <restlet.version>2.2.1</restlet.version>
         <servlet.version>3.0.1</servlet.version>
