@@ -134,6 +134,12 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
 }
 ```
 
+## Roadmap, feature requests and bugs
+
+Please use the issue tracker at [https://metasolutions.atlassian.net/browse/LDC](https://metasolutions.atlassian.net/browse/LDC) to submit feature requests and bugs.
+
+The roadmap is generated out of the issues in JIRA, see [https://metasolutions.atlassian.net/browse/LDC/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel](the roadmap section) for details.
+
 ## Background
 
 Initial development was carried out within a [VINNOVA-funded project](http://metasolutions.se/projects/vidareutveckling-av-lankade-oppna-data-for-nobelpris/) for opening up information about Nobel Prizes and Nobel Laureates as Linked Open Data.
