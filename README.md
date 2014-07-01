@@ -2,8 +2,6 @@
 
 LD Cache is a minimum footprint caching server for Linked (Open) Data.
 
-Initial development was carried out within a [VINNOVA-funded project](http://metasolutions.se/projects/vidareutveckling-av-lankade-oppna-data-for-nobelpris/) for opening up information about Nobel Prizes and Nobel Laureates as Linked Open Data.
-
 ## Installation
 
 LD Cache can be built using Maven by running in the project's root directory: `mvn build`
@@ -11,6 +9,24 @@ LD Cache can be built using Maven by running in the project's root directory: `m
 The `webapp` package can be used for container deployments, e.g. Tomcat.
 
 The `standalone` package contains the folder `standalone/target/dist` with an executable and all dependency libraries. Run `bin/ldc <config> [port]` to execute. 
+
+## Usage (API)
+
+### Cached resources
+
+TODO
+
+### Uncached resources
+
+TODO
+
+### Content negotiation
+
+TODO
+
+### Examples
+
+TODO
 
 ## Configuration
 
@@ -117,6 +133,10 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
     ]
 }
 ```
+
+## Background
+
+Initial development was carried out within a [VINNOVA-funded project](http://metasolutions.se/projects/vidareutveckling-av-lankade-oppna-data-for-nobelpris/) for opening up information about Nobel Prizes and Nobel Laureates as Linked Open Data.
 
 ## License
 
