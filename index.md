@@ -176,12 +176,12 @@ Supported RDF formats and their MIME types:
 
 #### Cache
 
-* `http://ldc/?url=http://dbpedia.org/resource/Marie_Curie&follow=http://dbpedia.org/ontology/doctoralStudent&followDepth=2`
-* `http://ldc/?url=http://data.nobelprize.org/all/laureate&followTuples=rdf:type|http://data.nobelprize.org/terms/Laureate&follow=dbp:spouse&followDepth=3`
+* [`http://ldc/?url=http://dbpedia.org/resource/Marie_Curie&follow=http://dbpedia.org/ontology/doctoralStudent&followDepth=2`](http://ldc/?url=http://dbpedia.org/resource/Marie_Curie&follow=http://dbpedia.org/ontology/doctoralStudent&followDepth=2)
+* [`http://ldc/?url=http://data.nobelprize.org/all/laureate&followTuples=rdf:type|http://data.nobelprize.org/terms/Laureate&follow=dbp:spouse&followDepth=3`](http://ldc/?url=http://data.nobelprize.org/all/laureate&followTuples=rdf:type|http://data.nobelprize.org/terms/Laureate&follow=dbp:spouse&followDepth=3)
 
 #### Proxy
 
-* `http://ldc/proxy?url=http://dbpedia.org/resource/Henri_Becquerel`
+* [`http://ldc/proxy?url=http://dbpedia.org/resource/Henri_Becquerel`](http://ldc/proxy?url=http://dbpedia.org/resource/Henri_Becquerel)
 
 ## Roadmap, feature requests and bugs
 
