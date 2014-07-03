@@ -8,7 +8,9 @@ LD Cache can be built using Maven by running in the project's root directory: `m
 
 The `webapp` package can be used for container deployments, e.g. Tomcat.
 
-The `standalone` package contains the folder `standalone/target/dist` with an executable and all dependency libraries. Run `bin/ldc <config> [port]` to execute. 
+The `standalone` package contains the folder `standalone/target/dist` with an executable and all dependency libraries.
+
+Run `bin/ldc <config> [port]` to execute. 
 
 ## Configuration
 
