@@ -1,8 +1,8 @@
-# LD Cache
+# LDCache - a Linked Data Cache
 
-LD Cache is a minimum footprint caching server for Linked (Open) Data.
+LDCache is a minimum footprint caching server for Linked (Open) Data.
 
-See [the project's official website](http://ldcache.entrystore.org) for more information.
+See [the project's official website](http://entrystore.org/ldcache/) for more information.
 
 ## License
 
