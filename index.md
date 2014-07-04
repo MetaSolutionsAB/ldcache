@@ -48,7 +48,7 @@ Determines whether the proxy service should be enabled. The proxy service bypass
 
 ### datasets
 
-The properties in the section are used to specify datasets, i.e., which resources are to be cached, which links are supposed to be followed etc.
+The properties in the section are used to specify datasets, i.e., which resources are to be cached, which links are supposed to be followed etc. Most of the properties may also be used as request parameters.
 
 #### name
 
