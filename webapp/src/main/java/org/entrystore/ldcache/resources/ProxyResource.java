@@ -58,7 +58,9 @@ public class ProxyResource extends BaseResource {
 	@Get
 	public Representation represent() {
 
-		// FIXME only allow requests to URLs which are defined in configuration
+		// TODO only allow requests to URLs which are defined in configuration
+
+		// TODO only allow requests with an Accept content header that is an RDF MIME type
 
 		if (!hasAllParameters()) {
 			getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
