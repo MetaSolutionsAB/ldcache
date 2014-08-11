@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * @author Hannes Ebner
  */
-public interface Dataset {
+public interface Databundle {
 
 	URI getURI();
 

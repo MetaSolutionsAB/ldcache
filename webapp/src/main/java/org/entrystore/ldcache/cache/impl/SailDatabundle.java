@@ -17,7 +17,7 @@
 package org.entrystore.ldcache.cache.impl;
 
 import org.apache.log4j.Logger;
-import org.entrystore.ldcache.cache.Dataset;
+import org.entrystore.ldcache.cache.Databundle;
 import org.entrystore.ldcache.util.Properties;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -35,24 +35,24 @@ import java.util.Set;
 /**
  * @author Hannes Ebner
  */
-public class SailDataset implements Dataset {
+public class SailDatabundle implements Databundle {
 
-	Logger log = Logger.getLogger(SailDataset.class);
+	Logger log = Logger.getLogger(SailDatabundle.class);
 
 	Repository repository;
 
-	URI datasetURI;
+	URI databundleURI;
 
 	Date lastModified;
 
-	public SailDataset(Repository repository, URI datasetURI) {
+	public SailDatabundle(Repository repository, URI databundleURI) {
 		this.repository = repository;
-		this.datasetURI = datasetURI;
+		this.databundleURI = databundleURI;
 	}
 
 	@Override
 	public URI getURI() {
-		return datasetURI;
+		return databundleURI;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class SailDataset implements Dataset {
 			RepositoryConnection rc = null;
 			try {
 				rc = repository.getConnection();
-				RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.dctModified, null, false, datasetURI);
+				RepositoryResult<Statement> rr = rc.getStatements(databundleURI, Properties.dctModified, null, false, databundleURI);
 				if (rr.hasNext()) {
 					Statement result = rr.next();
 					if (result.getObject() instanceof Literal) {
@@ -86,14 +86,14 @@ public class SailDataset implements Dataset {
 
 	@Override
 	public Set<URI> getResources() {
-		if (datasetURI == null) {
+		if (databundleURI == null) {
 			throw new IllegalArgumentException();
 		}
 		RepositoryConnection rc = null;
 		Set<URI> result = null;
 		try {
 			rc = repository.getConnection();
-			RepositoryResult<Statement> rr = rc.getStatements(datasetURI, Properties.ldcResource, null, false, datasetURI);
+			RepositoryResult<Statement> rr = rc.getStatements(databundleURI, Properties.ldcResource, null, false, databundleURI);
 			while (rr.hasNext()) {
 				Statement s = rr.next();
 				if (s.getObject() instanceof URI) {
@@ -150,7 +150,7 @@ public class SailDataset implements Dataset {
 			try {
 				rc = repository.getConnection();
 				rc.begin();
-				rc.remove((Resource) null, (URI) null, (Value) null, datasetURI);
+				rc.remove((Resource) null, (URI) null, (Value) null, databundleURI);
 				rc.commit();
 			} catch (RepositoryException e) {
 				try {
@@ -180,8 +180,8 @@ public class SailDataset implements Dataset {
 			try {
 				rc = repository.getConnection();
 				rc.begin();
-				rc.remove(datasetURI, Properties.dctModified, null, datasetURI);
-				rc.add(datasetURI, Properties.dctModified, Properties.getValueFactory().createLiteral(lastModified), datasetURI);
+				rc.remove(databundleURI, Properties.dctModified, null, databundleURI);
+				rc.add(databundleURI, Properties.dctModified, Properties.getValueFactory().createLiteral(lastModified), databundleURI);
 				rc.commit();
 				this.lastModified = lastModified;
 			} catch (RepositoryException e) {

@@ -157,7 +157,7 @@ public class LDCache extends Application {
 		}
 
 		if (configURI == null) {
-			System.out.println("LDCache - http://bitbucket.org/metasolutions/ldcache");
+			System.out.println("LDCache - http://entrystore.org/ldcache/");
 			System.out.println("");
 			System.out.println("Usage: ldc <path to configuration file> [listening port]");
 			System.out.println("");

@@ -46,9 +46,9 @@ The timeout value is set in milliseconds for all possible timeout configurations
 
 Determines whether the proxy service should be enabled. The proxy service bypasses the cache and allows arbitrary RDF resources to be fetched. Like with the cache, format conversions are handled transparently through normal content negotiation between proxy and data source and proxy and client.
 
-### datasets
+### databundles
 
-The properties in the section are used to specify datasets, i.e., which resources are to be cached, which links are supposed to be followed etc. Most of the properties may also be used as request parameters.
+The properties in the section are used to specify databundles, i.e., which datasets/resources are to be cached, which links are supposed to be followed etc. Most of the properties may also be used as request parameters.
 
 #### name
 
@@ -93,7 +93,7 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
     "proxy": {
         "enabled": false
     },
-    "datasets": [
+    "databundles": [
         {
             "name": "dbpedia-laureates",
             "resources": [

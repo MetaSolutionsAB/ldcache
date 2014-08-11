@@ -12,7 +12,7 @@
     "proxy": {
         "enabled": false
     },
-    "datasets": [
+    "databundles": [
         {
             "name": "dbpedia-laureates",
             "resources": [

@@ -109,17 +109,17 @@ public class CacheImpl implements Cache {
 			HttpUtil.setTimeouts(timeout);
 		}
 
-		populateDatasets(config.getJSONArray("datasets"));
+		populateDatabundles(config.getJSONArray("databundles"));
 	}
 
-	private void populateDatasets(final JSONArray datasets) throws JSONException {
-		for (int i = 0; i < datasets.length(); i++) {
+	private void populateDatabundles(final JSONArray databundles) throws JSONException {
+		for (int i = 0; i < databundles.length(); i++) {
 			final int idx = i;
 			executor.submit(new Runnable() {
 				@Override
 				public void run() {
 					try {
-						populateResources(datasets.getJSONObject(idx));
+						populateResources(databundles.getJSONObject(idx));
 					} catch (JSONException e) {
 						log.error(e.getMessage());
 					}
@@ -128,36 +128,36 @@ public class CacheImpl implements Cache {
 		}
 	}
 
-	private void populateResources(JSONObject dataset) throws JSONException {
+	private void populateResources(JSONObject databundle) throws JSONException {
 		String name = "no name found";
-		if (dataset.has("name")) {
-			name = dataset.getString("name");
+		if (databundle.has("name")) {
+			name = databundle.getString("name");
 		}
-		log.info("Populating dataset: " + name);
+		log.info("Populating databundle: " + name);
 
 		org.json.JSONArray resources = null;
-		if (dataset.has("resources")) {
-			resources = dataset.getJSONArray("resources");
+		if (databundle.has("resources")) {
+			resources = databundle.getJSONArray("resources");
 		}
 
 		org.json.JSONArray follow = null;
-		if (dataset.has("follow")) {
-			follow = dataset.getJSONArray("follow");
+		if (databundle.has("follow")) {
+			follow = databundle.getJSONArray("follow");
 		}
 
 		org.json.JSONObject followTuples = null;
-		if (dataset.has("followTuples")) {
-			followTuples = dataset.getJSONObject("followTuples");
+		if (databundle.has("followTuples")) {
+			followTuples = databundle.getJSONObject("followTuples");
 		}
 
 		org.json.JSONArray includeDestinations = null;
-		if (dataset.has("includeDestinations")) {
-			includeDestinations = dataset.getJSONArray("includeDestinations");
+		if (databundle.has("includeDestinations")) {
+			includeDestinations = databundle.getJSONArray("includeDestinations");
 		}
 
 		int followDepth = 2;
-		if (dataset.has("followDepth")) {
-			followDepth = dataset.getInt("followDepth");
+		if (databundle.has("followDepth")) {
+			followDepth = databundle.getInt("followDepth");
 		}
 
 		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
