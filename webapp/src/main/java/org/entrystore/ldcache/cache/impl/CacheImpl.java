@@ -173,37 +173,38 @@ public class CacheImpl implements Cache {
 				continue;
 			}
 
-			// level > 0 to be able to re-run from index resources
-			if (level > 0 && RdfResource.hasResource(repository, (URI) r)) {
-				log.debug("Already in repository, skipping: " + r);
-				continue;
+			Model graph = null;
+			if (RdfResource.hasResource(repository, (URI) r)) {
+				graph = RdfResource.loadFromRepository(repository, (URI) r).getGraph();
+			} else {
+				throttle((URI) r);
+				graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
+				if (graph != null) {
+					RdfResource res = new RdfResource((URI) r, graph, new Date());
+					RdfResource.saveToRepository(repository, res);
+					log.info("Cached in local repository: " + r);
+				} else {
+					log.warn("Model was null for: " + r.toString());
+				}
 			}
 
-			throttle((URI) r);
-			Model graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
-			if (graph != null) {
-				RdfResource res = new RdfResource((URI) r, graph, new Date());
-				RdfResource.saveToRepository(this.repository, res);
-				log.info("Cached in local repository: " + r);
-				if (propertiesToFollow != null && level < depth) {
-					for (Value prop : propertiesToFollow) {
-						if (prop instanceof URI) {
-							Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
-							if (followTuples != null) {
-								objects.addAll(getMatchingSubjects(graph, followTuples));
-							}
-							objects = filterResources(objects, includeDestinations);
-							if (objects.size() == 0) {
-								continue;
-							}
-							log.debug("Following: " + prop);
-							loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
+			if (propertiesToFollow != null && level < depth) {
+				for (Value prop : propertiesToFollow) {
+					if (prop instanceof URI) {
+						Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
+						if (followTuples != null) {
+							objects.addAll(getMatchingSubjects(graph, followTuples));
 						}
+						objects = filterResources(objects, includeDestinations);
+						if (objects.size() == 0) {
+							continue;
+						}
+						log.debug("Following: " + prop);
+						loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
 					}
 				}
-			} else {
-				log.warn("Model was null for: " + r.toString());
 			}
+
 			visited.add((URI) r);
 		}
 	}
