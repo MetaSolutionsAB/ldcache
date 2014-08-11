@@ -86,7 +86,7 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
         "indexes": "cspo,posc,spoc"
     },
     "cache": {
-        "rateLimit": 10,
+        "rateLimit": 5,
         "threadPoolSize": 5,
         "requestTimeout": 10000
     },
@@ -97,7 +97,8 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
         {
             "name": "dbpedia-laureates",
             "resources": [
-                "http://data.nobelprize.org/all/laureate"
+                "http://data.nobelprize.org/all/laureate",
+                "http://data.nobelprize.org/all/nobelprize"
             ],
             "follow": [
                 "http://dbpedia.org/ontology/affiliation",
@@ -105,9 +106,10 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
                 "http://dbpedia.org/ontology/deathPlace",
                 "owl:sameAs"
             ],
-            "followTuples": {
-                "rdf:type": "http://data.nobelprize.org/terms/Laureate"
-            },
+            "followTuples": [
+                { "rdf:type": "http://data.nobelprize.org/terms/Laureate" },
+                { "rdf:type": "http://data.nobelprize.org/terms/NobelPrize" }
+            ],
             "includeDestinations": [
                 "http://dbpedia.org/resource/",
                 "http://data.nobelprize.org"

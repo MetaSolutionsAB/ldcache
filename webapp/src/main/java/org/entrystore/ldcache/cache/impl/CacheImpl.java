@@ -145,9 +145,9 @@ public class CacheImpl implements Cache {
 			follow = databundle.getJSONArray("follow");
 		}
 
-		org.json.JSONObject followTuples = null;
+		org.json.JSONArray followTuples = null;
 		if (databundle.has("followTuples")) {
-			followTuples = databundle.getJSONObject("followTuples");
+			followTuples = databundle.getJSONArray("followTuples");
 		}
 
 		org.json.JSONArray includeDestinations = null;
@@ -160,7 +160,7 @@ public class CacheImpl implements Cache {
 			followDepth = databundle.getInt("followDepth");
 		}
 
-		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
 	}
 
 	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
