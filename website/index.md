@@ -199,4 +199,4 @@ Initial development was carried out within a [VINNOVA-funded project](http://met
 
 ## License
 
-[MetaSolutions AB](http://www.metasolutions.se) licenses this work under the terms of the Apache License 2.0 (the "License"); you may not use this file except in compliance with the License. See the [`LICENSE.txt`](LICENSE.txt) file distributed with this work for the full License.
+[MetaSolutions AB](http://www.metasolutions.se) licenses this work under the terms of the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) (the "License"); you may not use this file except in compliance with the License. See the `LICENSE.txt` file distributed with this work for the full License.
