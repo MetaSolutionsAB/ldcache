@@ -77,6 +77,7 @@ public class LDCache extends Application {
 
 		if (configURI != null && "file".equals(configURI.getScheme())) {
 			config = new JSONObject(new String(Files.readAllBytes(Paths.get(configURI))));
+			configureLogging(config);
 			cache = new CacheImpl(config);
 		} else {
 			log.error("No configuration found");
@@ -156,9 +157,6 @@ public class LDCache extends Application {
 	}
 
 	public static void main(String[] args) {
-		BasicConfigurator.configure();
-		Logger.getRootLogger().setLevel(Level.DEBUG);
-
 		int port = 8282;
 		URI configURI = null;
 
@@ -194,6 +192,20 @@ public class LDCache extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void configureLogging(JSONObject config) {
+		BasicConfigurator.configure();
+		Level l = Level.INFO;
+		if (config.has("loglevel")) {
+			try {
+				l = Level.toLevel(config.getString("loglevel"), Level.INFO);
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
+		}
+		Logger.getRootLogger().setLevel(l);
+		log.info("Log level set to " + l);
 	}
 
 	// TODO handle shutdown, i.e., repository, executor in cacheimpl, and probably other stuff

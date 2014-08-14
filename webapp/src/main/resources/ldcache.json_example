@@ -9,6 +9,7 @@
         "threadPoolSize": 5,
         "requestTimeout": 10000
     },
+    "loglevel": "info",
     "proxy": {
         "enabled": false
     },

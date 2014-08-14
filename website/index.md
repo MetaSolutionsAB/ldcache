@@ -74,6 +74,10 @@ A whitelist with prefixes of destinations to include when traversing the graph.
 
 The maximum depth of the graph traversal.
 
+### Logging
+
+The log level can be set through "loglevel". Available levels of detail are: debug, info, warn, error.
+
 ### Example
 
 Find a ready to use example configuration in `ldcache.json_example` in `webapp/src/main/resources/`.
@@ -93,6 +97,7 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
     "proxy": {
         "enabled": false
     },
+    "loglevel": "info",
     "databundles": [
         {
             "name": "dbpedia-laureates",
