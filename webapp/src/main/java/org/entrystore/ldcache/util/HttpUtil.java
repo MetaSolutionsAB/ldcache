@@ -17,6 +17,7 @@
 package org.entrystore.ldcache.util;
 
 import org.apache.log4j.Logger;
+import org.entrystore.ldcache.LDCache;
 import org.openrdf.model.Model;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -59,6 +60,7 @@ public class HttpUtil {
 
 		Request request = new Request(Method.GET, url);
 		request.getClientInfo().setAcceptedMediaTypes(RdfMedia.RDF_FORMATS);
+		request.getClientInfo().setAgent("LDCache/" + LDCache.getVersion());
 		Response response = client.handle(request);
 
 		// Alternative to calling the client directly:

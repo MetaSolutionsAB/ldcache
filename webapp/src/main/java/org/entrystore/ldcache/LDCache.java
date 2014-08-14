@@ -40,7 +40,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * EntryStore tools to manipulate Sesame repositories.
@@ -54,6 +57,8 @@ public class LDCache extends Application {
 	private static boolean verbose = false;
 
 	public static String KEY = "org.entryscape.ldcache.LDCache";
+
+	private static String VERSION = null;
 
 	Cache cache;
 
@@ -124,6 +129,19 @@ public class LDCache extends Application {
 		}
 		log.error("Unable to find " + fileName + " in classpath");
 		return null;
+	}
+
+	public static String getVersion() {
+		if (VERSION == null) {
+			URI versionFile = getConfigurationURI("VERSION.txt");
+			try {
+				VERSION = new String(Files.readAllBytes(Paths.get(versionFile)));
+			} catch (IOException e) {
+				VERSION = new SimpleDateFormat("yyyyMMdd").format(new Date());
+				log.error(e.getMessage());
+			}
+		}
+		return VERSION;
 	}
 
 	private boolean isProxyEnabled() {
