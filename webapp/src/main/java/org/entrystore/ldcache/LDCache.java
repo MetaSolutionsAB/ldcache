@@ -21,6 +21,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
 import org.entrystore.ldcache.cache.impl.CacheImpl;
+import org.entrystore.ldcache.filters.JSCallbackFilter;
 import org.entrystore.ldcache.resources.CacheResource;
 import org.entrystore.ldcache.resources.ProxyResource;
 import org.entrystore.ldcache.resources.StatusResource;
@@ -101,9 +102,12 @@ public class LDCache extends Application {
 		router.attach("/status", StatusResource.class);
 		router.attach("/", CacheResource.class);
 
+		JSCallbackFilter jsCallback = new JSCallbackFilter();
+		jsCallback.setNext(router);
+
 		// CORSFilter corsFilter = new CORSFilter();
 
-		return router;
+		return jsCallback;
 	}
 
 	public Cache getCache() {
