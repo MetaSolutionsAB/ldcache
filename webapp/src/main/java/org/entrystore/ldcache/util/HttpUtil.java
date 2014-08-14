@@ -36,6 +36,7 @@ import org.restlet.util.Series;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * @author Hannes Ebner
@@ -133,6 +134,29 @@ public class HttpUtil {
 		client.getContext().getParameters().set("socketTimeout", timeoutStr);
 		client.getContext().getParameters().set("readTimeout", timeoutStr);
 		client.getContext().getParameters().set("socketConnectTimeoutMs", timeoutStr);
+	}
+
+	public static HashMap<String, String> parseRequest(String request) {
+		HashMap<String, String> argsAndVal = new HashMap<String, String>();
+
+		int r = request.lastIndexOf("?");
+		String req = request.substring(r + 1);
+		String[] arguments = req.split("&");
+
+		try {
+			for (int i = 0; i < arguments.length; i++) {
+				if (arguments[i].contains("=")) {
+					String[] elements = arguments[i].split("=");
+					argsAndVal.put(elements[0], elements[1]);
+				} else {
+					argsAndVal.put(arguments[i], "");
+				}
+			}
+		} catch (IndexOutOfBoundsException e) {
+			// special case!
+			argsAndVal.put(req, "");
+		}
+		return argsAndVal;
 	}
 
 }
