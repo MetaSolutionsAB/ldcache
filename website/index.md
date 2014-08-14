@@ -141,6 +141,7 @@ Available parameters:
 * `followTuples`: A comma-separated list of predicate-object tuples in the format `predicate|object`. The subjects of matching triples are followed. Useful for index-resources.
 * `includeDestinations`: A comma-separated whitelist with prefixes of destinations to include when traversing the graph.
 * `followDepth`: The maximum distance from the root-resource that should be followed. Default is 0, i.e., only the resource identified by the `url` parameter will be fetched and no links are followed.
+* `callback`: Name of the callback method to be used for a JSONP response. Works only with JSON-based responses, i.e., `application/rdf+json`, `application/ld+json`, and `application/json`.
 
 Some of the parameters allow to provide a URI in which the following namespace definitions may be used:
 
