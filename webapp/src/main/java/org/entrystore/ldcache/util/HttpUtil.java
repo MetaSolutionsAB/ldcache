@@ -31,6 +31,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
+import org.restlet.util.Series;
 
 import java.io.IOException;
 import java.io.InputStream;
