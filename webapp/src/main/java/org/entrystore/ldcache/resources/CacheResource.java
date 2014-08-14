@@ -27,6 +27,7 @@ import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
@@ -76,7 +77,7 @@ public class CacheResource extends BaseResource {
 			} catch (RDFHandlerException e) {
 				log.error("RDF handler " + e.getMessage());
 			}
-			return new ByteArrayRepresentation(baos.toByteArray());
+			return new ByteArrayRepresentation(baos.toByteArray(), MediaType.valueOf(outputMediaType));
 		}
 
 		getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
