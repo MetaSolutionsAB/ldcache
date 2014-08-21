@@ -107,7 +107,7 @@ public class RdfResource implements Resource {
 					result = new RdfResource(resourceURI, resource, modified);
 				}
 			} else {
-				log.error("Unable to load " + resourceURI + " because of missing modification date in repository");
+				log.error("Unable to load from repository (not found): " + resourceURI);
 			}
 		} catch (RepositoryException e) {
 			log.error(e.getMessage());
