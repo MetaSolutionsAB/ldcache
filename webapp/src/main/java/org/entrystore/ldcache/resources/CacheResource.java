@@ -56,7 +56,7 @@ public class CacheResource extends BaseResource {
 		}
 		this.cache = getLDCache().getCache();
 
-		log.info("Received caching request for " + url);
+		log.info("Received request for: " + url);
 
 		Model resultGraph = cache.getMergedGraphs(new HashSet<Value>(Arrays.asList(url)), follow, followTuples, includeDestinations, followDepth);
 		if (resultGraph.size() > 0) {
