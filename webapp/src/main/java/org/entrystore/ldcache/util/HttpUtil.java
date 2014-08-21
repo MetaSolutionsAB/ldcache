@@ -62,7 +62,7 @@ public class HttpUtil {
 
 		Request request = new Request(Method.GET, url);
 		request.getClientInfo().setAcceptedMediaTypes(RdfMedia.RDF_FORMATS);
-		request.getClientInfo().setAgent("LDCache/" + LDCache.getVersion());
+		// request.getClientInfo().setAgent("LDCache/" + LDCache.getVersion());
 		Response response = client.handle(request);
 
 		// Alternative to calling the client directly:
