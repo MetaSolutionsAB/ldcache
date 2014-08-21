@@ -133,7 +133,8 @@ public class CacheImpl implements Cache {
 		if (databundle.has("name")) {
 			name = databundle.getString("name");
 		}
-		log.info("Populating databundle: " + name);
+		log.info("Populating databundle \"" + name + "\"");
+		Date begin = new Date();
 
 		org.json.JSONArray resources = null;
 		if (databundle.has("resources")) {
@@ -161,6 +162,9 @@ public class CacheImpl implements Cache {
 		}
 
 		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
+
+		long duration = (new Date().getTime() - begin.getTime())/1000;
+		log.info("Finished populating databundle \"" + name + "\" in " + duration + " seconds");
 	}
 
 	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
