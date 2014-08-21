@@ -182,7 +182,7 @@ public class CacheImpl implements Cache {
 				if (graph != null) {
 					RdfResource res = new RdfResource((URI) r, graph, new Date());
 					RdfResource.saveToRepository(repository, res);
-					log.info("Cached in local repository: " + r);
+					log.info("Cached: " + r);
 				} else {
 					log.warn("Model was null for: " + r.toString());
 				}
