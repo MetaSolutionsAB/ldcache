@@ -17,8 +17,8 @@
 package org.entrystore.ldcache.util;
 
 import org.apache.log4j.Logger;
-import org.entrystore.ldcache.LDCache;
 import org.openrdf.model.Model;
+import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -31,7 +31,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
-import org.restlet.util.Series;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,12 +90,12 @@ public class HttpUtil {
 		return response;
 	}
 
-	public static Model getModelFromResponse(Response response) {
+	public static Model getModelFromResponse(Value r, Response response) {
 		if (response == null) {
 			throw new IllegalArgumentException();
 		}
 		if (response.getStatus().isError()) {
-			log.warn("Skipping response due to error status");
+			log.warn("Skipping response from <" + r + "> due to error status: " + response.getStatus());
 			return null;
 		}
 		Model result = null;
