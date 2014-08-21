@@ -41,7 +41,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -141,6 +140,7 @@ public class LDCache extends Application {
 			URI versionFile = getConfigurationURI("VERSION.txt");
 			try {
 				VERSION = new String(Files.readAllBytes(Paths.get(versionFile)));
+				// TODO add code to read file from within JAR; the current code cannot handle this
 			} catch (IOException e) {
 				VERSION = new SimpleDateFormat("yyyyMMdd").format(new Date());
 				log.error(e.getMessage());
