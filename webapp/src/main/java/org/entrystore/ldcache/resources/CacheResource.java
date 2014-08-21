@@ -70,14 +70,21 @@ public class CacheResource extends BaseResource {
 			if (outputMediaType == null) {
 				outputMediaType = "application/rdf+xml";
 			}
-			log.debug("Writing content in format " + outputMediaType);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try {
-				Rio.write(resultGraph, baos, RDFFormat.forMIMEType(outputMediaType));
-			} catch (RDFHandlerException e) {
-				log.error("RDF handler " + e.getMessage());
+			RDFFormat rdfFormat = RDFFormat.forMIMEType(outputMediaType);
+			if (rdfFormat != null) {
+				log.debug("Writing content in format " + outputMediaType);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				try {
+					Rio.write(resultGraph, baos, rdfFormat);
+				} catch (RDFHandlerException e) {
+					log.error("RDF handler " + e.getMessage());
+				}
+				return new ByteArrayRepresentation(baos.toByteArray(), MediaType.valueOf(outputMediaType));
+			} else {
+				log.debug("Received request with MIME type that cannot be understood by Sesame Rio: " + outputMediaType);
+				getResponse().setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+				return null;
 			}
-			return new ByteArrayRepresentation(baos.toByteArray(), MediaType.valueOf(outputMediaType));
 		}
 
 		getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
