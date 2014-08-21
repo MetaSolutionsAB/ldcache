@@ -149,6 +149,8 @@ public class CacheResource extends BaseResource {
 		int depth = 2;
 		if (json.has("depth")) {
 			try {
+				// FIXME should we accept only a certain max depth to not stretch the limits of
+				// the server too much, e.g. maxdepth=2? This should probably be configurable.
 				depth = json.getInt("depth");
 			} catch (JSONException e) {
 				log.error(e.getMessage());
