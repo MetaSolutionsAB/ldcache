@@ -169,7 +169,7 @@ public class CacheImpl implements Cache {
 				continue;
 			}
 			if (visited.contains(r)) {
-				log.debug("Already visited, skipping: " + r);
+				log.debug("Already visited, skipping <" + r + ">");
 				continue;
 			}
 
@@ -178,30 +178,30 @@ public class CacheImpl implements Cache {
 				graph = RdfResource.loadFromRepository(repository, (URI) r).getGraph();
 			} else {
 				throttle((URI) r);
-				graph = HttpUtil.getModelFromResponse(HttpUtil.getResourceFromURL(r.toString(), 0));
+				graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0));
 				if (graph != null) {
 					RdfResource res = new RdfResource((URI) r, graph, new Date());
 					RdfResource.saveToRepository(repository, res);
-					log.info("Cached: " + r);
+					log.info("Cached <" + r + ">");
 				} else {
-					log.warn("Model was null for: " + r.toString());
+					log.warn("Model was null for <" + r + ">");
 				}
 			}
 
-			if (propertiesToFollow != null && level < depth) {
+			if (graph != null && propertiesToFollow != null && level < depth) {
+				Set<Value> objects = new HashSet<>();
 				for (Value prop : propertiesToFollow) {
 					if (prop instanceof URI) {
-						Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
-						if (followTuples != null) {
-							objects.addAll(getMatchingSubjects(graph, followTuples));
-						}
-						objects = filterResources(objects, includeDestinations);
-						if (objects.size() == 0) {
-							continue;
-						}
-						log.debug("Following: " + prop);
-						loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
+						objects.addAll(graph.filter(null, (URI) prop, null).objects());
 					}
+				}
+				if (followTuples != null) {
+					objects.addAll(getMatchingSubjects(graph, followTuples));
+				}
+				objects = filterResources(objects, includeDestinations);
+				if (objects.size() > 0) {
+					log.debug("Crawling " + objects.size() + " resources linked from <" + r + ">: " + objects);
+					loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
 				}
 			}
 
