@@ -105,11 +105,11 @@
             <artifactId>org.restlet.ext.simple</artifactId>
             <version>${restlet.version}</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet.ext.httpclient</artifactId>
             <version>${restlet.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
