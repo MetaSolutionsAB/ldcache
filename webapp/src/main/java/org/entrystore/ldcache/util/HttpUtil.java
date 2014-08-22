@@ -95,7 +95,7 @@ public class HttpUtil {
 			response.getEntity().release();
 			if (ref != null) {
 				String refURL = ref.getIdentifier();
-				log.debug("Request redirected to <" + refURL + ">");
+				log.debug("Request redirected from <" + url + "> to <" + refURL + ">");
 				return getResourceFromURL(refURL, loopCount + 1);
 			}
 		}
