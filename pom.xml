@@ -83,7 +83,7 @@
                         </program>
                     </programs>
                     <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
-                    <extraJvmArguments>-Xms256m</extraJvmArguments>
+                    <extraJvmArguments>-Xmx512m</extraJvmArguments>
                 </configuration>
                 <executions>
                     <execution>
@@ -98,12 +98,6 @@
     </build>
 
     <repositories>
-        <!--
-            <repository>
-            <id>OpenRDF</id>
-            <url>http://repo.aduna-software.org/maven2/releases</url>
-            </repository>
-        -->
         <repository>
             <id>Maven</id>
             <url>http://repo1.maven.org/maven2</url>
