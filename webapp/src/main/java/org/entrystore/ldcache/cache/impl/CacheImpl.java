@@ -20,7 +20,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.RateLimiter;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
-import org.entrystore.ldcache.cache.Resource;
 import org.entrystore.ldcache.util.HttpUtil;
 import org.entrystore.ldcache.util.JsonUtil;
 import org.entrystore.ldcache.util.ModelUtil;
@@ -167,7 +166,8 @@ public class CacheImpl implements Cache {
 		log.info("Finished populating databundle \"" + name + "\" in " + duration + " seconds");
 	}
 
-	private void loadAndCacheResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
+	private Model loadResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth, boolean loadAndCache, boolean returnModel) {
+		Model result = new LinkedHashModel();
 		for (URI r : resources) {
 			if (visited.contains(r)) {
 				log.debug("Already visited, skipping <" + r + ">");
@@ -178,77 +178,53 @@ public class CacheImpl implements Cache {
 			if (RdfResource.hasResource(repository, (URI) r)) {
 				graph = RdfResource.loadFromRepository(repository, (URI) r).getGraph();
 			} else {
-				throttle((URI) r);
-				graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0));
-				if (graph != null) {
-					RdfResource res = new RdfResource((URI) r, graph, new Date());
-					RdfResource.saveToRepository(repository, res);
-					log.info("Cached <" + r + ">");
-				} else {
-					log.warn("Model was null for <" + r + ">");
+				if (loadAndCache) {
+					throttle((URI) r);
+					graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0));
+					if (graph != null) {
+						RdfResource res = new RdfResource((URI) r, graph, new Date());
+						RdfResource.saveToRepository(repository, res);
+						log.info("Cached <" + r + ">");
+					} else {
+						log.warn("Model was null for <" + r + ">");
+					}
 				}
 			}
 
-			if (graph != null && propertiesToFollow != null && level < depth) {
-				Set<URI> objects = new HashSet<>();
-				for (URI prop : propertiesToFollow) {
-					objects.addAll(ModelUtil.valueToURI(graph.filter(null, (URI) prop, null).objects()));
+			if (graph != null) {
+				if (returnModel) {
+					result.addAll(graph);
 				}
-				if (followTuples != null) {
-					objects.addAll(getMatchingSubjects(graph, followTuples));
-				}
-				objects = filterResources(objects, includeDestinations);
-				if (objects.size() > 0) {
-					log.debug("Crawling " + objects.size() + " resources linked from <" + r + ">: " + objects);
-					loadAndCacheResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth);
-				}
-			}
-
-			visited.add((URI) r);
-		}
-	}
-
-	private Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
-		Model result = new LinkedHashModel();
-		for (URI r : resources) {
-			if (visited.contains(r)) {
-				log.debug("Already visited, skipping: " + r);
-				continue;
-			}
-			visited.add((URI) r);
-			Resource res = RdfResource.loadFromRepository(this.repository, (URI) r);
-			if (res == null || res.getGraph() == null) {
-				continue;
-			}
-			log.info("Loaded from local repository: " + r);
-			Model graph = res.getGraph();
-			result.addAll(graph);
-			if (follow != null && level < depth+1) {
-				for (URI prop : follow) {
-					Set<URI> objects = ModelUtil.valueToURI(graph.filter(null, (URI) prop, null).objects());
+				if (propertiesToFollow != null && level < depth) {
+					Set<URI> objects = new HashSet<>();
+					for (URI prop : propertiesToFollow) {
+						objects.addAll(ModelUtil.valueToURI(graph.filter(null, (URI) prop, null).objects()));
+					}
 					if (followTuples != null) {
 						objects.addAll(getMatchingSubjects(graph, followTuples));
 					}
 					objects = filterResources(objects, includeDestinations);
-					if (objects.size() == 0) {
-						continue;
+					objects.remove(r);
+					if (objects.size() > 0) {
+						log.debug("Crawling " + objects.size() + " resources linked from <" + r + ">: " + objects);
+						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth, loadAndCache, returnModel));
 					}
-					log.debug("Following: " + prop);
-					result.addAll(getMergedGraphs(objects, follow, followTuples, includeDestinations, visited, ++level, depth));
 				}
 			}
+
+			visited.add((URI) r);
 		}
 		return result;
 	}
 
 	@Override
 	public void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
-		loadAndCacheResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
+		loadResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth, true, false);
 	}
 
 	@Override
 	public Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
-		return getMergedGraphs(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
+		return loadResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth, false, true);
 	}
 
 	public Repository getRepository() {
