@@ -119,7 +119,7 @@ public class CacheImpl implements Cache {
 				@Override
 				public void run() {
 					try {
-						populateResources(databundles.getJSONObject(idx));
+						populateDatabundle(databundles.getJSONObject(idx));
 					} catch (JSONException e) {
 						log.error(e.getMessage());
 					}
@@ -128,7 +128,7 @@ public class CacheImpl implements Cache {
 		}
 	}
 
-	private void populateResources(JSONObject databundle) throws JSONException {
+	private void populateDatabundle(JSONObject databundle) throws JSONException {
 		String name = "no name found";
 		if (databundle.has("name")) {
 			name = databundle.getString("name");
