@@ -17,6 +17,7 @@
 package org.entrystore.ldcache.util;
 
 import org.apache.log4j.Logger;
+import org.entrystore.ldcache.LDCache;
 import org.openrdf.model.Model;
 import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
@@ -32,8 +33,11 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -46,11 +50,23 @@ public class HttpUtil {
 
 	private static Client client;
 
+	private static String USERAGENT;
+
 	static {
 		Context clientContext = new Context();
 		client = new Client(clientContext, Arrays.asList(Protocol.HTTP, Protocol.HTTPS));
 		setTimeouts(10000);
 		log.debug("Initialized HTTP client");
+		USERAGENT = new StringBuffer().
+				append("LDCache/").append(LDCache.getVersion().trim()).
+				append(" (").
+				append(System.getProperty("os.arch")).append("; ").
+				append(System.getProperty("os.name")).append(" ").append(System.getProperty("os.version")).append("; ").
+				append("Java; ").
+				append(System.getProperty("java.vendor")).append(" ").append(System.getProperty("java.version")).
+				append(")").
+				toString();
+		log.debug("User-Agent for HTTP requests set to \"" + USERAGENT + "\"");
 	}
 
 	public static Response getResourceFromURL(String url, int loopCount) {
@@ -61,7 +77,7 @@ public class HttpUtil {
 
 		Request request = new Request(Method.GET, url);
 		request.getClientInfo().setAcceptedMediaTypes(RdfMedia.RDF_FORMATS);
-		// request.getClientInfo().setAgent("LDCache/" + LDCache.getVersion());
+		request.getClientInfo().setAgent(USERAGENT);
 		Response response = client.handle(request);
 
 		// Alternative to calling the client directly:
@@ -156,6 +172,25 @@ public class HttpUtil {
 			argsAndVal.put(req, "");
 		}
 		return argsAndVal;
+	}
+
+	public static String readFirstLine(URL url) {
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			return in.readLine();
+		} catch (IOException ioe) {
+			log.error(ioe.getMessage());
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+		return null;
 	}
 
 }

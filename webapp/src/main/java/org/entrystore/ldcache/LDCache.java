@@ -25,6 +25,7 @@ import org.entrystore.ldcache.filters.JSCallbackFilter;
 import org.entrystore.ldcache.resources.CacheResource;
 import org.entrystore.ldcache.resources.ProxyResource;
 import org.entrystore.ldcache.resources.StatusResource;
+import org.entrystore.ldcache.util.HttpUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Application;
@@ -139,11 +140,13 @@ public class LDCache extends Application {
 		if (VERSION == null) {
 			URI versionFile = getConfigurationURI("VERSION.txt");
 			try {
-				VERSION = new String(Files.readAllBytes(Paths.get(versionFile)));
-				// TODO add code to read file from within JAR; the current code cannot handle this
+				log.debug("Reading version number from " + versionFile);
+				VERSION = HttpUtil.readFirstLine(versionFile.toURL());
 			} catch (IOException e) {
-				VERSION = new SimpleDateFormat("yyyyMMdd").format(new Date());
 				log.error(e.getMessage());
+			}
+			if (VERSION == null) {
+				VERSION = new SimpleDateFormat("yyyyMMdd").format(new Date());
 			}
 		}
 		return VERSION;
