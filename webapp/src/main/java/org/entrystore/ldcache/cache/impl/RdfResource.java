@@ -125,7 +125,10 @@ public class RdfResource implements Resource {
 
 	public static void saveToRepository(Repository repository, Resource resource) {
 		if (repository == null || resource == null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Arguments must not be null");
+		}
+		if (resource.getURI() == null || resource.getGraph() == null || resource.getModified() == null) {
+			throw new IllegalArgumentException("The resource properties must not be null");
 		}
 		synchronized (repository) {
 			RepositoryConnection rc = null;
