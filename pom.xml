@@ -27,8 +27,8 @@
     <packaging>pom</packaging>
 
     <properties>
-        <sesame.version>2.8.0-beta2</sesame.version>
-        <!--<sesame.version>2.7.13</sesame.version>-->
+        <!--<sesame.version>2.8.0-beta2</sesame.version>-->
+        <sesame.version>2.7.13</sesame.version>
         <slf4j.version>1.7.5</slf4j.version>
         <restlet.version>2.2.2</restlet.version>
         <servlet.version>3.0.1</servlet.version>
