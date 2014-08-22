@@ -19,6 +19,7 @@ package org.entrystore.ldcache.util;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.LDCache;
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -106,7 +107,7 @@ public class HttpUtil {
 		return response;
 	}
 
-	public static Model getModelFromResponse(Value r, Response response) {
+	public static Model getModelFromResponse(URI r, Response response) {
 		if (response == null) {
 			throw new IllegalArgumentException();
 		}
