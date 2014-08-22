@@ -16,11 +16,37 @@
 
 package org.entrystore.ldcache.util;
 
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Hannes Ebner
  */
 public class ModelUtil {
 
+	public static Set<URI> valueToURI(Set<Value> values) {
+		Set<URI> result = new HashSet<>();
+		for (Value v : values) {
+			if (v != null && v instanceof URI) {
+				result.add((URI) v);
+			}
+		}
+		return result;
+	}
 
+	public static Set<URI> resourceToURI(Set<Resource> resources) {
+		Set<URI> result = new HashSet<>();
+		for (Resource r : resources) {
+			if (r != null && r instanceof URI) {
+				result.add((URI) r);
+			}
+		}
+		return result;
+	}
 
 }

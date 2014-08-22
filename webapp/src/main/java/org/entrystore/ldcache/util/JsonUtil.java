@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 
@@ -36,8 +37,8 @@ public class JsonUtil {
 
 	static Logger log = Logger.getLogger(JsonUtil.class);
 
-	public static Set<Value> jsonArrayToValueSet(JSONArray array) {
-		Set<Value> result = new HashSet<Value>();
+	public static Set<URI> jsonArrayToURISet(JSONArray array) {
+		Set<URI> result = new HashSet<>();
 		for (int i = 0; i < array.length(); i++) {
 			String uri = null;
 			try {
@@ -54,7 +55,7 @@ public class JsonUtil {
 	}
 
 	public static Set<String> jsonArrayToStringSet(JSONArray array) {
-		Set<String> result = new HashSet();
+		Set<String> result = new HashSet<>();
 		for (int i = 0; i < array.length(); i++) {
 			String uri = null;
 			try {
@@ -70,8 +71,8 @@ public class JsonUtil {
 		return result;
 	}
 
-	public static Map<Value, Value> jsonArrayToMap(JSONArray array) {
-		Map<Value, Value> result = new HashMap<>();
+	public static Map<URI, URI> jsonArrayToMap(JSONArray array) {
+		Map<URI, URI> result = new HashMap<>();
 		for (int i = 0; i < array.length(); i++) {
 			try {
 				JSONObject obj = array.getJSONObject(i);
@@ -90,8 +91,8 @@ public class JsonUtil {
 		return result;
 	}
 
-	public static Map<Value, Value> jsonObjectToMap(JSONObject object) {
-		Map<Value, Value> result = new HashMap<>();
+	public static Map<URI, URI> jsonObjectToMap(JSONObject object) {
+		Map<URI, URI> result = new HashMap<>();
 		Iterator it = object.keys();
 		while (it.hasNext()) {
 			String key = (String) it.next();

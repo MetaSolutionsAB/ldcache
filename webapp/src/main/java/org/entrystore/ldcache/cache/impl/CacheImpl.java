@@ -23,12 +23,12 @@ import org.entrystore.ldcache.cache.Cache;
 import org.entrystore.ldcache.cache.Resource;
 import org.entrystore.ldcache.util.HttpUtil;
 import org.entrystore.ldcache.util.JsonUtil;
+import org.entrystore.ldcache.util.ModelUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -161,17 +161,14 @@ public class CacheImpl implements Cache {
 			followDepth = databundle.getInt("followDepth");
 		}
 
-		loadAndCacheResources(JsonUtil.jsonArrayToValueSet(resources), JsonUtil.jsonArrayToValueSet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToURISet(resources), JsonUtil.jsonArrayToURISet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
 
 		long duration = (new Date().getTime() - begin.getTime())/1000;
 		log.info("Finished populating databundle \"" + name + "\" in " + duration + " seconds");
 	}
 
-	private void loadAndCacheResources(Set<Value> resources, Set<Value> propertiesToFollow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
-		for (Value r : resources) {
-			if (!(r instanceof URI)) {
-				continue;
-			}
+	private void loadAndCacheResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
+		for (URI r : resources) {
 			if (visited.contains(r)) {
 				log.debug("Already visited, skipping <" + r + ">");
 				continue;
@@ -193,11 +190,9 @@ public class CacheImpl implements Cache {
 			}
 
 			if (graph != null && propertiesToFollow != null && level < depth) {
-				Set<Value> objects = new HashSet<>();
-				for (Value prop : propertiesToFollow) {
-					if (prop instanceof URI) {
-						objects.addAll(graph.filter(null, (URI) prop, null).objects());
-					}
+				Set<URI> objects = new HashSet<>();
+				for (URI prop : propertiesToFollow) {
+					objects.addAll(ModelUtil.valueToURI(graph.filter(null, (URI) prop, null).objects()));
 				}
 				if (followTuples != null) {
 					objects.addAll(getMatchingSubjects(graph, followTuples));
@@ -213,12 +208,9 @@ public class CacheImpl implements Cache {
 		}
 	}
 
-	private Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
+	private Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth) {
 		Model result = new LinkedHashModel();
-		for (Value r : resources) {
-			if (!(r instanceof URI)) {
-				continue;
-			}
+		for (URI r : resources) {
 			if (visited.contains(r)) {
 				log.debug("Already visited, skipping: " + r);
 				continue;
@@ -232,19 +224,17 @@ public class CacheImpl implements Cache {
 			Model graph = res.getGraph();
 			result.addAll(graph);
 			if (follow != null && level < depth+1) {
-				for (Value prop : follow) {
-					if (prop instanceof URI) {
-						Set<Value> objects = new HashSet<>(graph.filter(null, (URI) prop, null).objects());
-						if (followTuples != null) {
-							objects.addAll(getMatchingSubjects(graph, followTuples));
-						}
-						objects = filterResources(objects, includeDestinations);
-						if (objects.size() == 0) {
-							continue;
-						}
-						log.debug("Following: " + prop);
-						result.addAll(getMergedGraphs(objects, follow, followTuples, includeDestinations, visited, ++level, depth));
+				for (URI prop : follow) {
+					Set<URI> objects = ModelUtil.valueToURI(graph.filter(null, (URI) prop, null).objects());
+					if (followTuples != null) {
+						objects.addAll(getMatchingSubjects(graph, followTuples));
 					}
+					objects = filterResources(objects, includeDestinations);
+					if (objects.size() == 0) {
+						continue;
+					}
+					log.debug("Following: " + prop);
+					result.addAll(getMergedGraphs(objects, follow, followTuples, includeDestinations, visited, ++level, depth));
 				}
 			}
 		}
@@ -252,12 +242,12 @@ public class CacheImpl implements Cache {
 	}
 
 	@Override
-	public void loadAndCacheResources(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth) {
+	public void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
 		loadAndCacheResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
 	}
 
 	@Override
-	public Model getMergedGraphs(Set<Value> resources, Set<Value> follow, Map<Value, Value> followTuples, Set<String> includeDestinations, int depth) {
+	public Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
 		return getMergedGraphs(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth);
 	}
 
@@ -265,31 +255,31 @@ public class CacheImpl implements Cache {
 		return this.repository;
 	}
 
-	private Set<Value> filterResources(Set<Value> resources, Set<String> allowedPrefixes) {
+	private Set<URI> filterResources(Set<URI> resources, Set<String> allowedPrefixes) {
 		if (resources == null || allowedPrefixes == null) {
 			throw new IllegalArgumentException("Parameters must not be null");
 		}
 		if (allowedPrefixes.contains("*")) {
 			return resources;
 		}
-		Set<Value> result = new HashSet<>();
-		for (Value v : resources) {
+		Set<URI> result = new HashSet<>();
+		for (URI r : resources) {
 			for (String p : allowedPrefixes) {
-				if (v.stringValue().startsWith(p)) {
-					result.add(v);
+				if (r.stringValue().startsWith(p)) {
+					result.add(r);
 				}
 			}
 		}
 		return result;
 	}
 
-	private Set<Value> getMatchingSubjects(Model model, Map<Value, Value> tuplesPO) {
+	private Set<URI> getMatchingSubjects(Model model, Map<URI, URI> tuplesPO) {
 		if (model == null || tuplesPO == null) {
 			throw new IllegalArgumentException();
 		}
-		Set<Value> result = new HashSet<>();
-		for (Value v : tuplesPO.keySet()) {
-			result.addAll(model.filter(null, (URI) v, tuplesPO.get(v)).subjects());
+		Set<URI> result = new HashSet<>();
+		for (URI v : tuplesPO.keySet()) {
+			result.addAll(ModelUtil.resourceToURI(model.filter(null, (URI) v, tuplesPO.get(v)).subjects()));
 		}
 		return result;
 	}

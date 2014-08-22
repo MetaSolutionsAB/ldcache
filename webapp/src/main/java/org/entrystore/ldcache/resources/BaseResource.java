@@ -47,9 +47,9 @@ public class BaseResource extends ServerResource {
 
 	int followDepth;
 
-	Set<Value> follow;
+	Set<URI> follow;
 
-	Map<Value, Value> followTuples;
+	Map<URI, URI> followTuples;
 
 	Set<String> includeDestinations;
 
