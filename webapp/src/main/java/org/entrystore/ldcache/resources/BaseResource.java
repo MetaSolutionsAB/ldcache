@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.entrystore.ldcache.LDCache;
 import org.entrystore.ldcache.util.NS;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -53,6 +52,8 @@ public class BaseResource extends ServerResource {
 
 	Set<String> includeDestinations;
 
+	Set<String> includeLiteralLanguages;
+
 	@Override
 	public void init(Context c, Request request, Response response) {
 		parameters = parseRequest(request.getResourceRef().getRemainingPart());
@@ -67,6 +68,7 @@ public class BaseResource extends ServerResource {
 		follow = null;
 		followTuples = null;
 		includeDestinations = null;
+		includeLiteralLanguages = null;
 	}
 
 	static public HashMap<String, String> parseRequest(String request) {
@@ -133,6 +135,21 @@ public class BaseResource extends ServerResource {
 		// default is "all destinations allowed"
 		if (includeDestinations.size() == 0) {
 			includeDestinations.add("*");
+		}
+
+		includeLiteralLanguages = new HashSet();
+		if (parameters.containsKey("includeLiteralLanguages")) {
+			String includeLangStr = urlDecode(parameters.get("includeLiteralLanguages"));
+			if (includeLangStr != null) {
+				String[] includeSplitStr = includeLangStr.split(",");
+				for (String s : includeSplitStr) {
+					includeLiteralLanguages.add(s.trim().toLowerCase());
+				}
+			}
+		}
+		// default is "all languages allowed"
+		if (includeLiteralLanguages.size() == 0) {
+			includeLiteralLanguages.add("*");
 		}
 
 		if (parameters.containsKey("followDepth")) {
