@@ -18,7 +18,6 @@ package org.entrystore.ldcache.cache;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.repository.Repository;
 
 import java.util.Map;
@@ -29,9 +28,10 @@ import java.util.Set;
  */
 public interface Cache {
 
-	void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth);
+	// TODO replace some of the parameters with a DatabundleProperties class
+	void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth);
 
-	Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth);
+	Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth);
 
 	Repository getRepository();
 

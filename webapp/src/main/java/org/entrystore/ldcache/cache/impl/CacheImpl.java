@@ -155,18 +155,23 @@ public class CacheImpl implements Cache {
 			includeDestinations = databundle.getJSONArray("includeDestinations");
 		}
 
+		org.json.JSONArray includeLiteralLanguages = null;
+		if (databundle.has("includeLiteralLanguages")) {
+			includeLiteralLanguages = databundle.getJSONArray("includeLiteralLanguages");
+		}
+
 		int followDepth = 2;
 		if (databundle.has("followDepth")) {
 			followDepth = databundle.getInt("followDepth");
 		}
 
-		loadAndCacheResources(JsonUtil.jsonArrayToURISet(resources), JsonUtil.jsonArrayToURISet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), followDepth);
+		loadAndCacheResources(JsonUtil.jsonArrayToURISet(resources), JsonUtil.jsonArrayToURISet(follow), JsonUtil.jsonArrayToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), JsonUtil.jsonArrayToStringSet(includeLiteralLanguages, true), followDepth);
 
 		long duration = (new Date().getTime() - begin.getTime())/1000;
 		log.info("Finished populating databundle \"" + name + "\" in " + duration + " seconds");
 	}
 
-	private Model loadResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<URI> visited, int level, int depth, boolean loadAndCache, boolean returnModel) {
+	private Model loadResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, Set<URI> visited, int level, int depth, boolean loadAndCache, boolean returnModel) {
 		Model result = new LinkedHashModel();
 		for (URI r : resources) {
 			if (visited.contains(r)) {
@@ -177,11 +182,13 @@ public class CacheImpl implements Cache {
 			Model graph = null;
 			if (RdfResource.hasResource(repository, (URI) r)) {
 				graph = RdfResource.loadFromRepository(repository, (URI) r).getGraph();
+				graph = ModelUtil.filterLanguageLiterals(graph, r, includeLiteralLanguages);
 			} else {
 				if (loadAndCache) {
 					throttle((URI) r);
 					graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0));
 					if (graph != null) {
+						graph = ModelUtil.filterLanguageLiterals(graph, r, includeLiteralLanguages);
 						RdfResource res = new RdfResource((URI) r, graph, new Date());
 						RdfResource.saveToRepository(repository, res);
 						log.info("Cached <" + r + ">");
@@ -207,7 +214,7 @@ public class CacheImpl implements Cache {
 					objects.remove(r);
 					if (objects.size() > 0) {
 						log.debug("Crawling " + objects.size() + " resources linked from <" + r + ">: " + objects);
-						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, visited, level + 1, depth, loadAndCache, returnModel));
+						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, includeLiteralLanguages, visited, level + 1, depth, loadAndCache, returnModel));
 					}
 				}
 			}
@@ -218,13 +225,13 @@ public class CacheImpl implements Cache {
 	}
 
 	@Override
-	public void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
-		loadResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth, true, false);
+	public void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth) {
+		loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, new HashSet<URI>(), 0, depth, true, false);
 	}
 
 	@Override
-	public Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, int depth) {
-		return loadResources(resources, follow, followTuples, includeDestinations, new HashSet<URI>(), 0, depth, false, true);
+	public Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth) {
+		return loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, new HashSet<URI>(), 0, depth, false, true);
 	}
 
 	public Repository getRepository() {
