@@ -74,6 +74,10 @@ A whitelist with prefixes of destinations to include when traversing the graph.
 
 The maximum depth of the graph traversal.
 
+#### includeLanguageLiterals
+
+A whitelist with language tags, i.e., `en`, `sv`, etc to determine which literales should be cached. May contain two special values: empty string `""` to also cache literals without a language tag set, and `*` to cache all literals independently of their language. The latter is default and all literals are cached if the parameter is omitted.
+
 ### Logging
 
 The log level can be set through "loglevel". Available levels of detail are: debug, info, warn, error.
@@ -119,7 +123,13 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
                 "http://dbpedia.org/resource/",
                 "http://data.nobelprize.org"
             ],
-            "followDepth": 3
+            "followDepth": 3,
+            "includeLiteralLanguages": [
+                "",
+                "en",
+                "de",
+                "sv"
+            ]
         }
     ]
 }
@@ -141,6 +151,7 @@ Available parameters:
 * `followTuples`: A comma-separated list of predicate-object tuples in the format `predicate|object`. The subjects of matching triples are followed. Useful for index-resources.
 * `includeDestinations`: A comma-separated whitelist with prefixes of destinations to include when traversing the graph.
 * `followDepth`: The maximum distance from the root-resource that should be followed. Default is 0, i.e., only the resource identified by the `url` parameter will be fetched and no links are followed.
+* `includeLanguageLiterals`: A comma-separated whitelist with language tags to specify which literals to include. Supply an empty string to include literals without a language tag set, and `*` to cache all literals independently of their language. Language filtering is not active by default, e.g. if this parameter is omitted.
 * `callback`: Name of the callback method to be used for a JSONP response. Works only with JSON-based responses, i.e., `application/rdf+json`, `application/ld+json`, and `application/json`.
 
 Some of the parameters allow to provide a URI in which the following namespace definitions may be used:
