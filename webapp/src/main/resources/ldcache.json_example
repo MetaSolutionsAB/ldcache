@@ -34,7 +34,13 @@
                 "http://dbpedia.org/resource/",
                 "http://data.nobelprize.org"
             ],
-            "followDepth": 3
+            "followDepth": 3,
+            "includeLiteralLanguages": [
+                "",
+                "en",
+                "de",
+                "sv"
+            ]
         }
     ]
 }

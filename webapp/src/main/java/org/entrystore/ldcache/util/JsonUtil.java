@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 
 import java.util.HashMap;
@@ -71,6 +70,14 @@ public class JsonUtil {
 		return result;
 	}
 
+	public static Set<String> jsonArrayToStringSet(JSONArray array, boolean toLowerCaseAndTrim) {
+		if (toLowerCaseAndTrim) {
+			return toLowerCaseAndTrim(jsonArrayToStringSet(array));
+		} else {
+			return jsonArrayToStringSet(array);
+		}
+	}
+
 	public static Map<URI, URI> jsonArrayToMap(JSONArray array) {
 		Map<URI, URI> result = new HashMap<>();
 		for (int i = 0; i < array.length(); i++) {
@@ -104,6 +111,21 @@ public class JsonUtil {
 			} catch (JSONException e) {
 				log.warn(e.getMessage());
 				continue;
+			}
+		}
+		return result;
+	}
+
+	public static Set<String> toLowerCaseAndTrim(Set<String> set) {
+		if (set == null) {
+			throw new IllegalArgumentException("Parameter must not be null");
+		}
+		Set<String> result = new HashSet<>();
+		for (String s : set) {
+			if (s != null) {
+				result.add(s.trim().toLowerCase());
+			} else {
+				result.add(s);
 			}
 		}
 		return result;

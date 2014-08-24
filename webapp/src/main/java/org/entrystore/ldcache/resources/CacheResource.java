@@ -24,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
@@ -59,7 +58,7 @@ public class CacheResource extends BaseResource {
 
 		log.info("Received request for: " + url);
 
-		Model resultGraph = cache.getMergedGraphs(new HashSet<URI>(Arrays.asList(url)), follow, followTuples, includeDestinations, followDepth);
+		Model resultGraph = cache.getMergedGraphs(new HashSet<URI>(Arrays.asList(url)), follow, followTuples, includeDestinations, includeLiteralLanguages, followDepth);
 		if (resultGraph.size() > 0) {
 			String outputMediaType = null;
 			if (parameters.containsKey("format")) {
@@ -147,6 +146,15 @@ public class CacheResource extends BaseResource {
 			}
 		}
 
+		org.json.JSONArray includeLiteralLanguages = null;
+		if (json.has("includeLiteralLanguages")) {
+			try {
+				includeLiteralLanguages = json.getJSONArray("includeLiteralLanguages");
+			} catch (JSONException e) {
+				log.error(e.getMessage());
+			}
+		}
+
 		int depth = 2;
 		if (json.has("depth")) {
 			try {
@@ -160,7 +168,7 @@ public class CacheResource extends BaseResource {
 
 		// FIXME start a thread to do the following
 
-		cache.loadAndCacheResources(JsonUtil.jsonArrayToURISet(toAdd), JsonUtil.jsonArrayToURISet(toFollow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), depth);
+		cache.loadAndCacheResources(JsonUtil.jsonArrayToURISet(toAdd), JsonUtil.jsonArrayToURISet(toFollow), JsonUtil.jsonObjectToMap(followTuples), JsonUtil.jsonArrayToStringSet(includeDestinations), JsonUtil.jsonArrayToStringSet(includeLiteralLanguages), depth);
 
 		getResponse().setStatus(Status.SUCCESS_OK); // FIXME change to ACCEPTED if run in background thread
 	}
