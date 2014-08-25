@@ -213,7 +213,7 @@ public class CacheImpl implements Cache {
 					objects = filterResources(objects, includeDestinations);
 					objects.remove(r);
 					if (objects.size() > 0) {
-						log.debug("Crawling " + objects.size() + " resources linked from <" + r + ">: " + objects);
+						log.debug("Crawling " + objects.size() + " resource" + (objects.size() == 1 ? "" : "s") + " linked from <" + r + ">: " + objects);
 						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, includeLiteralLanguages, visited, level + 1, depth, loadAndCache, returnModel));
 					}
 				}

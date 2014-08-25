@@ -127,9 +127,8 @@ public class HttpUtil {
 				log.error(e.getMessage());
 			}
 			if (content != null) {
-				log.debug("Requesting parser format for " + mt);
 				RDFFormat rdfFormat = Rio.getParserFormatForMIMEType(mt.getName());
-				log.debug("Got parser format " + rdfFormat);
+				log.debug("Got parser format " + rdfFormat + " for MIME type " + mt);
 				if (rdfFormat != null) {
 					try {
 						result = Rio.parse(content, "", rdfFormat);
