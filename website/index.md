@@ -206,7 +206,7 @@ Supported RDF formats and their MIME types:
 
 ## Roadmap, feature requests and bugs
 
-Please use the issue tracker at [https://metasolutions.atlassian.net/browse/LDC](https://metasolutions.atlassian.net/browse/LDC) to submit feature requests and bugs.
+Please refer to the issue tracker at [https://metasolutions.atlassian.net/browse/LDC](https://metasolutions.atlassian.net/browse/LDC) to submit feature requests and bugs.
 
 The roadmap is generated out of the issues in JIRA, see [https://metasolutions.atlassian.net/browse/LDC/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel](the roadmap section) for details.
 
