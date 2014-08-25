@@ -198,6 +198,8 @@ public class CacheImpl implements Cache {
 				}
 			}
 
+			visited.add((URI) r);
+
 			if (graph != null) {
 				if (returnModel) {
 					result.addAll(graph);
@@ -218,8 +220,6 @@ public class CacheImpl implements Cache {
 					}
 				}
 			}
-
-			visited.add((URI) r);
 		}
 		return result;
 	}
