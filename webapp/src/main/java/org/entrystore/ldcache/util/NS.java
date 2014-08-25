@@ -46,6 +46,8 @@ public class NS {
 
 	public static String owl = "http://www.w3.org/2002/07/owl#";
 
+	public static String nobel = "http://data.nobelprize.org/terms/";
+
 	private static HashMap<String, String> map = new HashMap<>();
 
 	static {
