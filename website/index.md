@@ -95,14 +95,14 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
 ```
 {
     "repository": {
-        "type": "memory",
+        "type": "native",
         "uri": "file:///srv/ldcache/repository/",
-        "indexes": "cspo,posc,spoc"
+        "indexes": "cspo"
     },
     "cache": {
         "rateLimit": 5,
         "threadPoolSize": 5,
-        "requestTimeout": 10000
+        "requestTimeout": 30000
     },
     "proxy": {
         "enabled": false
