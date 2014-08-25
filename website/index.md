@@ -48,6 +48,14 @@ The size of the thread pool for caching data. Currently not used.
 
 The timeout value is set in milliseconds for all possible timeout configurations, i.e., this value is set for socket, connection, etc timeouts. A more fine-grained configuration may be implemented if necessary.
 
+#### retriesOnError
+
+The number of times the caching algorithm retries to fetch a resource in case of an HTTP error status. Default is 0.
+
+#### timeBetweenRetries
+
+The time between the fetching attempts. Only used if `retriesOnError` is greater than zero. Default is 1000 ms.   
+
 ### proxy
 
 Determines whether the proxy service should be enabled. The proxy service bypasses the cache and allows arbitrary RDF resources to be fetched. Like with the cache, format conversions are handled transparently through normal content negotiation between proxy and data source and proxy and client.
@@ -102,7 +110,9 @@ Find a ready to use example configuration in `ldcache.json_example` in `webapp/s
     "cache": {
         "rateLimit": 5,
         "threadPoolSize": 5,
-        "requestTimeout": 30000
+        "requestTimeout": 30000,
+        "retriesOnError": 3,
+        "timeBetweenRetries": 1000
     },
     "proxy": {
         "enabled": false

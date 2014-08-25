@@ -69,7 +69,7 @@ public class ProxyResource extends BaseResource {
 
 		log.info("Received proxy request for " + url);
 
-		clientResponse = HttpUtil.getResourceFromURL(url.toString(), 0);
+		clientResponse = HttpUtil.getResourceFromURL(url.toString(), 0, 0, 0);
 		input = null;
 		MediaType representationMediaType = null;
 		if (clientResponse != null) {

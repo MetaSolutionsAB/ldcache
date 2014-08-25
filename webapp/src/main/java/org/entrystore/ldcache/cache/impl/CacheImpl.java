@@ -62,6 +62,10 @@ public class CacheImpl implements Cache {
 
 	double rateLimit = 2.0;
 
+	int cachingRetriesOnError = 0;
+
+	long cachingTimeBetweenRetries = 1000;
+
 	ExecutorService executor;
 
 	public CacheImpl(JSONObject config) throws JSONException {
@@ -106,6 +110,16 @@ public class CacheImpl implements Cache {
 			long timeout = cacheConfig.getLong("requestTimeout");
 			log.info("Setting request timeout to " + timeout);
 			HttpUtil.setTimeouts(timeout);
+		}
+
+		if (cacheConfig.has("retriesOnError")) {
+			cachingRetriesOnError = cacheConfig.getInt("retriesOnError");
+			log.info("Setting retries on error to " + cachingRetriesOnError);
+		}
+
+		if (cacheConfig.has("timeBetweenRetries")) {
+			cachingTimeBetweenRetries = cacheConfig.getLong("timeBetweenRetries");
+			log.info("Setting time between retries to " + cachingTimeBetweenRetries + " ms");
 		}
 
 		populateDatabundles(config.getJSONArray("databundles"));
@@ -186,7 +200,7 @@ public class CacheImpl implements Cache {
 			} else {
 				if (loadAndCache) {
 					throttle((URI) r);
-					graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0));
+					graph = HttpUtil.getModelFromResponse(r, HttpUtil.getResourceFromURL(r.toString(), 0, cachingRetriesOnError, cachingTimeBetweenRetries));
 					if (graph != null) {
 						graph = ModelUtil.filterLanguageLiterals(graph, r, includeLiteralLanguages);
 						RdfResource res = new RdfResource((URI) r, graph, new Date());

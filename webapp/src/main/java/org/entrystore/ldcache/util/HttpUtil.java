@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.entrystore.ldcache.LDCache;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
@@ -70,7 +69,7 @@ public class HttpUtil {
 		log.debug("User-Agent for HTTP requests set to \"" + USERAGENT + "\"");
 	}
 
-	public static Response getResourceFromURL(String url, int loopCount) {
+	public static Response getResourceFromURL(String url, int loopCount, int retriesOnError, long timeBetweenRetries) {
 		if (loopCount > 10) {
 			log.warn("More than 10 redirect loops detected, aborting");
 			return null;
@@ -79,7 +78,21 @@ public class HttpUtil {
 		Request request = new Request(Method.GET, url);
 		request.getClientInfo().setAcceptedMediaTypes(RdfMedia.RDF_FORMATS);
 		request.getClientInfo().setAgent(USERAGENT);
-		Response response = client.handle(request);
+		Response response = null;
+		int tries = 0;
+		while (tries++ < (retriesOnError + 1)) {
+			response = client.handle(request);
+			if (response.getStatus().isError()) {
+				try {
+					log.info("Error when fetching <" + url + ">, retrying in " + timeBetweenRetries + " ms");
+					Thread.sleep(timeBetweenRetries);
+				} catch (InterruptedException e) {
+					log.error(e.getMessage());
+				}
+			} else {
+				break;
+			}
+		}
 
 		// Alternative to calling the client directly:
 		// HttpClientHelper helper = new HttpClientHelper(client);
@@ -97,7 +110,7 @@ public class HttpUtil {
 			if (ref != null) {
 				String refURL = ref.getIdentifier();
 				log.debug("Request redirected from <" + url + "> to <" + refURL + ">");
-				return getResourceFromURL(refURL, loopCount + 1);
+				return getResourceFromURL(refURL, loopCount + 1, retriesOnError, timeBetweenRetries);
 			}
 		}
 
