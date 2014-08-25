@@ -2,9 +2,15 @@
 
 LDCache is a minimum footprint caching server for Linked (Open) Data.
 
+## Source code
+
+The project's source code is available through a [Git repository on Bitbucket](https://bitbucket.org/metasolutions/ldcache/) which is also [mirrored to GitHub](https://github.com/MetaSolutionsAB/ldcache).
+
+Currently there are no pre-built binaries that can be downloaded.
+
 ## Installation
 
-LD Cache can be built using Maven by running in the project's root directory: `mvn build`
+LDCache can be built using Maven by running in the project's root directory: `mvn build`
 
 The `webapp` package can be used for container deployments, e.g. Tomcat.
 
