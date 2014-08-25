@@ -80,9 +80,10 @@ public class HttpUtil {
 		request.getClientInfo().setAgent(USERAGENT);
 		Response response = null;
 		int tries = 0;
-		while (tries++ < (retriesOnError + 1)) {
+		do {
 			response = client.handle(request);
-			if (response.getStatus().isError()) {
+			tries++;
+			if (retriesOnError > 0 && response.getStatus().isError()) {
 				try {
 					log.info("Error when fetching <" + url + ">, retrying in " + timeBetweenRetries + " ms");
 					Thread.sleep(timeBetweenRetries);
@@ -92,7 +93,7 @@ public class HttpUtil {
 			} else {
 				break;
 			}
-		}
+		} while (tries < retriesOnError);
 
 		// Alternative to calling the client directly:
 		// HttpClientHelper helper = new HttpClientHelper(client);
