@@ -126,7 +126,7 @@ public class ProxyResource extends BaseResource {
 						} catch (RDFHandlerException e) {
 							log.error(e.getMessage());
 						}
-						output = new ByteArrayRepresentation(baos.toByteArray());
+						output = new ByteArrayRepresentation(baos.toByteArray(), MediaType.valueOf(outputMediaType));
 					}
 				}
 			}
