@@ -52,6 +52,8 @@ The timeout value is set in milliseconds for all possible timeout configurations
 
 The number of times the caching algorithm retries to fetch a resource in case of an HTTP error status. Default is 0.
 
+To retry an HTTP request which failed because of a server side error may seem counter-intuitive (the probability is high that the following attempts will fail too), but it has occurred that D2R instances produce temporary errors which only last (fractions of) seconds. In such cases it is advantageous to retry with some small delay.
+
 #### timeBetweenRetries
 
 The time between the fetching attempts. Only used if `retriesOnError` is greater than zero. Default is 1000 ms.   
