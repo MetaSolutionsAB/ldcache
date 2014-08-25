@@ -5,4 +5,4 @@ build.sh
 target
 webapp/src/main/resources/ldcache.json
 test.*
-repo
+store
