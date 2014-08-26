@@ -17,6 +17,8 @@
 package org.entrystore.ldcache.cache.impl;
 
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.RateLimiter;
 import org.apache.log4j.Logger;
 import org.entrystore.ldcache.cache.Cache;
@@ -185,9 +187,14 @@ public class CacheImpl implements Cache {
 		log.info("Finished populating databundle \"" + name + "\" in " + duration + " seconds");
 	}
 
-	private Model loadResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int level, int depth, boolean loadAndCache, boolean returnModel) {
+	private Model loadResources(Set<URI> resources, Set<URI> propertiesToFollow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int level, int depth, boolean loadAndCache, boolean returnModel, Multimap<URI, Integer> visited) {
 		Model result = new LinkedHashModel();
 		for (URI r : resources) {
+			if (visited.containsEntry((URI) r, level)) {
+				log.debug("Skipping <" + r + ">, resource already fetched and traversed from on level " + level);
+				continue;
+			}
+
 			Model graph = null;
 			if (RdfResource.hasResource(repository, (URI) r)) {
 				graph = RdfResource.loadFromRepository(repository, (URI) r).getGraph();
@@ -208,6 +215,8 @@ public class CacheImpl implements Cache {
 			}
 
 			if (graph != null) {
+				visited.put((URI) r, level);
+
 				if (returnModel) {
 					result.addAll(graph);
 				}
@@ -223,7 +232,7 @@ public class CacheImpl implements Cache {
 					objects.remove(r);
 					if (objects.size() > 0) {
 						log.debug("Crawling " + objects.size() + " resource" + (objects.size() == 1 ? "" : "s") + " linked from <" + r + ">: " + objects);
-						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, includeLiteralLanguages, level + 1, depth, loadAndCache, returnModel));
+						result.addAll(loadResources(objects, propertiesToFollow, followTuples, includeDestinations, includeLiteralLanguages, level + 1, depth, loadAndCache, returnModel, visited));
 					}
 				}
 			}
@@ -233,12 +242,12 @@ public class CacheImpl implements Cache {
 
 	@Override
 	public void loadAndCacheResources(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth) {
-		loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, 0, depth, true, false);
+		loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, 0, depth, true, false, HashMultimap.<URI, Integer>create());
 	}
 
 	@Override
 	public Model getMergedGraphs(Set<URI> resources, Set<URI> follow, Map<URI, URI> followTuples, Set<String> includeDestinations, Set<String> includeLiteralLanguages, int depth) {
-		return loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, 0, depth, false, true);
+		return loadResources(resources, follow, followTuples, includeDestinations, includeLiteralLanguages, 0, depth, false, true, HashMultimap.<URI, Integer>create());
 	}
 
 	public Repository getRepository() {
