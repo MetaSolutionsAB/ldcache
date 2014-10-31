@@ -83,7 +83,7 @@
                         </program>
                     </programs>
                     <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
-                    <extraJvmArguments>-Xmx512m</extraJvmArguments>
+                    <extraJvmArguments>-Xmx1024m</extraJvmArguments>
                 </configuration>
                 <executions>
                     <execution>
