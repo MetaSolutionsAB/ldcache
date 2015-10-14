@@ -72,28 +72,6 @@
                     <compilerArgument></compilerArgument>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>appassembler-maven-plugin</artifactId>
-                <configuration>
-                    <programs>
-                        <program>
-                            <mainClass>org.entrystore.ldcache.LDCache</mainClass>
-                            <id>ldcache</id>
-                        </program>
-                    </programs>
-                    <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
-                    <extraJvmArguments>-Xmx1024m</extraJvmArguments>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assemble</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
