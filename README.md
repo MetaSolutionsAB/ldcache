@@ -1,4 +1,4 @@
-# LDCache - a Linked Data Cache [![Build Status](https://drone.io/bitbucket.org/metasolutions/ldcache/status.png)](https://drone.io/bitbucket.org/metasolutions/ldcache/latest)
+# LDCache - a Linked Data Cache
 
 LDCache is a minimum footprint caching server for Linked (Open) Data.
 
