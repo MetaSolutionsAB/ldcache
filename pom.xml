@@ -50,13 +50,13 @@
 
     <organization>
         <name>MetaSolutions AB</name>
-        <url>http://www.metasolutions.se</url>
+        <url>https://www.metasolutions.se</url>
     </organization>
 
     <licenses>
         <license>
             <name>Apache License Version 2.0</name>
-            <url>http://www.apache.org/licenses/</url>
+            <url>https://www.apache.org/licenses/</url>
             <distribution>repo</distribution>
             <comments />
         </license>
@@ -100,12 +100,16 @@
 
     <repositories>
         <repository>
+            <id>EntryStore</id>
+            <url>https://maven.entrystore.org</url>
+        </repository>
+        <repository>
             <id>Maven</id>
-            <url>http://repo1.maven.org/maven2</url>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>Restlet</id>
-            <url>http://maven.restlet.org</url>
+            <url>https://maven.restlet.org</url>
         </repository>
     </repositories>
 
